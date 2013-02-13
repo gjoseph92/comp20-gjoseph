@@ -7,6 +7,10 @@
 <script>
 	function updateStatus() {
 		status = document.getElementById("msg").value;
+		newStatus = document.createElement('p');
+		newStatus.textContent = status;
+		firstStatus = document.getElementById("status").firstChild;
+		document.getElementById("status").insertBefore(newStatus, firstStatus);
 		console.log(status);
 	}
 	
