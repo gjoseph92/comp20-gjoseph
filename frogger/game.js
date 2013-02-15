@@ -46,6 +46,8 @@ function drawRoadBG(y_start, y_end) {
 	ctx.restore();
 }
 
-function drawLily(y) { }
+function drawLily(y) {
+	ctx.drawImage(sprites, 0, 55, 399, 53, 0, y, 399, 53);
+}
 
 function drawOverlays() { }
