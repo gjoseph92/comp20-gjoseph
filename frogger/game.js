@@ -21,18 +21,16 @@ function start_game() {
 	else {
 		error = document.createElement('h2');
 		error.textContent = "Oops, your browser doesn't support Canvas in HTML5.";
-		
 		wrapper = canvas.parentNode;
 		wrapper.replaceChild(error, canvas);
 	}
 }
 
 function drawBackground() {
-	//black
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	
-	//level elements
+	//Level elements
 	drawWater(0, 274);
 	drawRoadBG(274, 530);
 	drawLily(57);
@@ -57,6 +55,8 @@ function drawRoadBG(y_start, y_end) {
 function drawLily(y) {
 	ctx.drawImage(sprites, 0, 55, 399, 53, 0, y, 399, 53);
 }
+
+//Draw Frogger title and game info footer
 function drawOverlays() {
 	ctx.drawImage(sprites, 14, 12, 323, 31, 14, 12, 323, 31);	//Frogger title
 	ctx.save();
@@ -73,7 +73,7 @@ function drawOverlays() {
 	ctx.restore();
 }
 
-//direction: 'up'/'u', 'left'/'l', 'right'/'r', 'down'/'d'
+//direction: 'up'/'u'/1, 'left'/'l'/2, 'right'/'r'/3, 'down'/'d'/4
 //jump: 'jump' or 'sit'
 //x and y are middle of frog
 function drawFrog(x, y, direction, jump) {
@@ -83,7 +83,7 @@ function drawFrog(x, y, direction, jump) {
 	var spriteWidth = 22;
 	var spriteHeight = 17;
 	if (jump == 'jump') jumping = true;
-	if (direction == 'up' || direction == 'u') {
+	if (direction == 'up' || direction == 'u' || direction == 1) {
 		if (jumping) {
 			spriteX = 46;
 			spriteY = 366;
@@ -97,7 +97,7 @@ function drawFrog(x, y, direction, jump) {
 			spriteHeight = 17;
 		}
 	}
-	else if (direction == 'down' || direction == 'd') {
+	else if (direction == 'down' || direction == 'd' || direction == 4) {
 		if (jumping) {
 			spriteX = 114;
 			spriteY = 366;
@@ -111,7 +111,7 @@ function drawFrog(x, y, direction, jump) {
 			spriteHeight = 17;
 		}
 	}
-	else if (direction == 'left' || direction == 'l') {
+	else if (direction == 'left' || direction == 'l' || direction == 2) {
 		if (jumping) {
 			spriteX = 112;
 			spriteY = 338;
@@ -125,7 +125,7 @@ function drawFrog(x, y, direction, jump) {
 			spriteHeight = 23;
 		}
 	}
-	else if (direction == 'right' || direction == 'r') {
+	else if (direction == 'right' || direction == 'r' || direction == 3) {
 		if (jumping) {
 			spriteX = 43;
 			spriteY = 335;
@@ -171,6 +171,7 @@ function drawLog(x, y, length) {
 
 //type: 'car'/1, 'racecar'/2, 'yellow_racer'/3, 'truck'/4
 //direction: 'up'/'u'/1, 'left'/'l'/2, 'right'/'r'/3, 'down'/'d'/4
+//x and y are middle of car
 function drawCar(x, y, type, direction) {
 	var spriteX;
 	var spriteY;
