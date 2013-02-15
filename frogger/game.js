@@ -13,6 +13,7 @@ function start_game() {
 		highscore = 0;	//for now
 		
 		drawBackground();
+		drawFrog(199, 515, 'up', 'sit');
 	}
 	else {
 		error = document.createElement('h2');
@@ -80,59 +81,59 @@ function drawFrog(x, y, direction, jump) {
 	if (jump == 'jump') jumping = true;
 	if (direction == 'up' || direction == 'u') {
 		if (jumping) {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 46;
+			spriteY = 366;
+			spriteWidth = 22;
+			spriteHeight = 25;
 		}
 		else {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 13;
+			spriteY = 369;
+			spriteWidth = 22;
+			spriteHeight = 17;
 		}
 	}
 	else if (direction == 'down' || direction == 'd') {
 		if (jumping) {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 114;
+			spriteY = 366;
+			spriteWidth = 21;
+			spriteHeight = 25;
 		}
 		else {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 81;
+			spriteY = 369;
+			spriteWidth = 22;
+			spriteHeight = 17;
 		}
 	}
 	else if (direction == 'left' || direction == 'l') {
 		if (jumping) {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 112;
+			spriteY = 338;
+			spriteWidth = 25;
+			spriteHeight = 21;
 		}
 		else {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 83;
+			spriteY = 335;
+			spriteWidth = 17;
+			spriteHeight = 23;
 		}
 	}
 	else if (direction == 'right' || direction == 'r') {
 		if (jumping) {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 43;
+			spriteY = 335;
+			spriteWidth = 25;
+			spriteHeight = 22;
 		}
 		else {
-			spriteX = ;
-			spriteY = ;
-			spriteWidth = ;
-			spriteHeight = ;
+			spriteX = 13;
+			spriteY = 334;
+			spriteWidth = 17;
+			spriteHeight = 23;
 		}
 	}
-	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
+	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x - spriteWidth/2, y- spriteHeight/2, spriteWidth, spriteHeight);
 }
