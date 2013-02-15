@@ -18,16 +18,26 @@ function start_game() {
 }
 
 function drawBackground() {
-	//black;
+	//black
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
 	//level elements
-	//water;
-	drawRoadBG(274, 236);
+	drawWater(0, 274);
+	drawRoadBG(274, 510);
 	drawLily(57);
 	
 	drawOverlays(); //Header and footer
 }
 
-function drawRoadBG(y, height) { }
+function drawWater(y_start, y_end) {
+	ctx.save();
+	ctx.fillStyle = 'MidnightBlue';
+	ctx.fillRect(0, y_start, canvas.width, y_end - y_start);
+	ctx.restore();
+}
+
+function drawRoadBG(y_start, y_end) { }
 
 function drawLily(y) { }
 
