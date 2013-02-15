@@ -12,22 +12,36 @@ function parse() {
 	JSONstring();
 	jobs = JSON.parse(str);
 	
+	jobsTable = document.createElement('table');
+	jobsTable.setAttribute('border', '1');
+	
 	for (var i = 0; i < jobs.length; i++) {
-		var job = jobs[i];
-		var jobDiv = document.createElement('div');
-		var company = document.createElement('h2');
-		var location = document.createElement('h3');
-		var position = document.createElement('p');
+		var jobRow = document.createElement('tr');
+		var companyCol = document.createElement('td');
+		var positionCol = document.createElement('td');
 		
+		var company = document.createElement('h2');
+		var location = document.createElement('p');
+		var position = document.createElement('h3');
+		
+		company.setAttribute('class', 'company');
+		location.setAttribute('class', 'location');
+		position.setAttribute('class', 'position');
+		
+		companyCol.appendChild(company);
+		companyCol.appendChild(location);
+		positionCol.appendChild(position);
+		
+		jobRow.appendChild(companyCol);
+		jobRow.appendChild(positionCol);
+		jobsTable.appendChild(jobRow);
+		
+		var job = jobs[i];
 		company.textContent = job.company;
 		location.textContent = job.location;
 		position.textContent = job.position;
-		
-		jobDiv.appendChild(company);
-		jobDiv.appendChild(location);
-		jobDiv.appendChild(position);
-		document.getElementById("list").appendChild(jobDiv);
 	}
+	document.getElementById('list').appendChild(jobsTable);
 }
 </script>
 </head>
