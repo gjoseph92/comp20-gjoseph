@@ -14,7 +14,9 @@ function start_game() {
 		
 		drawBackground();
 		drawFrog(199, 515, 'up', 'sit');
-		drawLog(100, 200, rand(1, 3))
+		drawLog(100, 200, rand(1, 3));
+		drawCar(40, 400, rand(1,4), rand(1,4));
+		drawCar(250, 450, rand(1,4), rand(1,4));
 	}
 	else {
 		error = document.createElement('h2');
@@ -139,6 +141,7 @@ function drawFrog(x, y, direction, jump) {
 	}
 	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x - spriteWidth/2, y- spriteHeight/2, spriteWidth, spriteHeight);
 }
+
 //length: 'short'/'s'/1, 'medium'/'m'/2, 'long'/'l'/3
 function drawLog(x, y, length) {
 	var spriteX;
@@ -164,6 +167,59 @@ function drawLog(x, y, length) {
 		spriteHeight = 21;
 	}
 	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);	
+}
+
+//type: 'car'/1, 'racecar'/2, 'yellow_racer'/3, 'truck'/4
+//direction: 'up'/'u'/1, 'left'/'l'/2, 'right'/'r'/3, 'down'/'d'/4
+function drawCar(x, y, type, direction) {
+	var spriteX;
+	var spriteY;
+	var spriteWidth;
+	var spriteHeight;
+	var spriteAngle;
+	var drawAngle;
+	if (!type || type == 'car' ||  type == 1) {
+		spriteX = 10;
+		spriteY = 267;
+		spriteWidth = 28;
+		spriteHeight = 20;
+		spriteAngle = Math.PI;
+	}
+	else if (type == 'racecar' ||  type == 2) {
+		spriteX = 47;
+		spriteY = 265;
+		spriteWidth = 27;
+		spriteHeight = 24;
+		spriteAngle = 0;
+	}
+	else if (type == 'yellow_racer' ||  type == 3) {
+		spriteX = 82;
+		spriteY = 264;
+		spriteWidth = 24;
+		spriteHeight = 26;
+		spriteAngle = Math.PI;
+	}
+	else if (type == 'truck' ||  type == 4) {
+		spriteX = 106;
+		spriteY = 302;
+		spriteWidth = 46;
+		spriteHeight = 18;
+		spriteAngle = Math.PI;
+	}
+	if (!direction || direction == 'up' || direction == 'u' || direction == 1)
+		drawAngle = -Math.PI/2;
+	else if (!direction || direction == 'left' || direction == 'l' || direction == 2)
+		drawAngle = -Math.PI;
+	else if (!direction || direction == 'right' || direction == 'r' || direction == 3)
+		drawAngle = 0;
+	else if (!direction || direction == 'down' || direction == 'd' || direction == 4)
+		drawAngle = Math.PI/2;
+	
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.rotate(drawAngle - spriteAngle);
+	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, -spriteWidth/2, -spriteHeight/2, spriteWidth, spriteHeight);
+	ctx.restore();	
 }
 
 function rand(start, end) { return Math.floor(Math.random()*(end-start+1)) + start; }
