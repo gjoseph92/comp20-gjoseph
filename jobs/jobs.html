@@ -12,8 +12,21 @@ function parse() {
 	JSONstring();
 	jobs = JSON.parse(str);
 	
-	for (var Job in jobs) {
+	for (var i = 0; i < jobs.length; i++) {
+		var job = jobs[i];
 		var jobDiv = document.createElement('div');
+		var company = document.createElement('h2');
+		var location = document.createElement('h3');
+		var position = document.createElement('p');
+		
+		company.textContent = job.company;
+		location.textContent = job.location;
+		position.textContent = job.position;
+		
+		jobDiv.appendChild(company);
+		jobDiv.appendChild(location);
+		jobDiv.appendChild(position);
+		document.getElementById("list").appendChild(jobDiv);
 	}
 }
 </script>
