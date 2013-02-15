@@ -53,7 +53,6 @@ function drawRoadBG(y_start, y_end) {
 function drawLily(y) {
 	ctx.drawImage(sprites, 0, 55, 399, 53, 0, y, 399, 53);
 }
-
 function drawOverlays() {
 	ctx.drawImage(sprites, 14, 12, 323, 31, 14, 12, 323, 31);	//Frogger title
 	ctx.save();
@@ -68,4 +67,72 @@ function drawOverlays() {
 	for (var i = 0; i < lives; i++)		//draw lives as frogs
 		ctx.drawImage(sprites, 13, 334, 17, 23, i * 19, canvas.height - 35, 17, 23);
 	ctx.restore();
+}
+
+//direction: 'up'/'u', 'left'/'l', 'right'/'r', 'down'/'d'
+//jump: 'jump' or 'sit'
+function drawFrog(x, y, direction, jump) {
+	var jumping = false;
+	var spriteX = 13;
+	var spriteY = 369;
+	var spriteWidth = 22;
+	var spriteHeight = 17;
+	if (jump == 'jump') jumping = true;
+	if (direction == 'up' || direction == 'u') {
+		if (jumping) {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+		else {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+	}
+	else if (direction == 'down' || direction == 'd') {
+		if (jumping) {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+		else {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+	}
+	else if (direction == 'left' || direction == 'l') {
+		if (jumping) {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+		else {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+	}
+	else if (direction == 'right' || direction == 'r') {
+		if (jumping) {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+		else {
+			spriteX = ;
+			spriteY = ;
+			spriteWidth = ;
+			spriteHeight = ;
+		}
+	}
+	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);
 }
