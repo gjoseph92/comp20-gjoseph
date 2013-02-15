@@ -14,29 +14,38 @@ function parse() {
 	jobs = JSON.parse(str);
 	
 	jobsTable = document.createElement('table');
-	jobsTable.setAttribute('border', '1');
+	jobsTable.setAttribute('border', '0');
 	jobsTable.setAttribute('id', 'jobsTable');
 	
 	for (var i = 0; i < jobs.length; i++) {
 		var jobRow = document.createElement('tr');
+		var locationRow = document.createElement('tr');
 		var companyCol = document.createElement('td');
 		var positionCol = document.createElement('td');
+		var locationCol = document.createElement('td');
+		jobRow.setAttribute('class', 'jobRow');
+		locationRow.setAttribute('class', 'locationRow');
+		companyCol.setAttribute('class', 'leftCol');
+		locationCol.setAttribute('class', 'leftCol');
+		positionCol.setAttribute('class', 'rightCol');
 		
-		var company = document.createElement('h2');
+		var company = document.createElement('h1');
 		var location = document.createElement('p');
-		var position = document.createElement('h3');
+		var position = document.createElement('h2');
 		
 		company.setAttribute('class', 'company');
 		location.setAttribute('class', 'location');
 		position.setAttribute('class', 'position');
 		
 		companyCol.appendChild(company);
-		companyCol.appendChild(location);
+		locationCol.appendChild(location);
 		positionCol.appendChild(position);
 		
 		jobRow.appendChild(companyCol);
 		jobRow.appendChild(positionCol);
+		locationRow.appendChild(locationCol);
 		jobsTable.appendChild(jobRow);
+		jobsTable.appendChild(locationRow);
 		
 		var job = jobs[i];
 		company.textContent = job.company;

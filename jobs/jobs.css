@@ -3,18 +3,32 @@ body {
 	font-family: Helvetica, sans-serif;
 }
 
-table {
+td {
+	vertical-align: text-bottom;
+	padding: 3px;
+	margin: 0px;
 }
 
-td {
-	vertical-align: top;
+td > * {
+	margin: 0px;
 }
+
+.leftCol {
+	text-align: right;
+	width: 50%;
+}
+.rightCol {
+	text-align: left;
+	width: 50%;
+}
+.leftCol > * { margin-right: 15px; }
+.rightCol > * { margin-left: 15px; }
+.locationRow > td > * { margin-bottom: 25px; }
 
 #list {
 	width: 75%;
 	margin: 3% auto;
 }
-
 #jobsTable {
 	width: 100%;
 }
