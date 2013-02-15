@@ -1,0 +1,20 @@
+body {
+	margin: 0;
+	font-family: Helvetica, sans-serif;
+}
+
+table {
+}
+
+td {
+	vertical-align: top;
+}
+
+#list {
+	width: 75%;
+	margin: 3% auto;
+}
+
+#jobsTable {
+	width: 100%;
+}
