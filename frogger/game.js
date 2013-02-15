@@ -14,6 +14,7 @@ function start_game() {
 		
 		drawBackground();
 		drawFrog(199, 515, 'up', 'sit');
+		drawLog(100, 200, rand(1, 3))
 	}
 	else {
 		error = document.createElement('h2');
@@ -72,6 +73,7 @@ function drawOverlays() {
 
 //direction: 'up'/'u', 'left'/'l', 'right'/'r', 'down'/'d'
 //jump: 'jump' or 'sit'
+//x and y are middle of frog
 function drawFrog(x, y, direction, jump) {
 	var jumping = false;
 	var spriteX = 13;
@@ -137,3 +139,31 @@ function drawFrog(x, y, direction, jump) {
 	}
 	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x - spriteWidth/2, y- spriteHeight/2, spriteWidth, spriteHeight);
 }
+//length: 'short'/'s'/1, 'medium'/'m'/2, 'long'/'l'/3
+function drawLog(x, y, length) {
+	var spriteX;
+	var spriteY;
+	var spriteWidth;
+	var spriteHeight;
+	if (!length || length == 'short' || length == 's' || length == 1) {
+		spriteX = 7;
+		spriteY = 230;
+		spriteWidth = 84;
+		spriteHeight = 21;
+	}
+	else if (length == 'medium' || length == 'm' || length == 2) {
+		spriteX = 7;
+		spriteY = 198;
+		spriteWidth = 116;
+		spriteHeight = 21;
+	}
+	else if (length == 'long' || length == 'l' || length == 3) {
+		spriteX = 7;
+		spriteY = 166;
+		spriteWidth = 177;
+		spriteHeight = 21;
+	}
+	ctx.drawImage(sprites, spriteX, spriteY, spriteWidth, spriteHeight, x, y, spriteWidth, spriteHeight);	
+}
+
+function rand(start, end) { return Math.floor(Math.random()*(end-start+1)) + start; }
