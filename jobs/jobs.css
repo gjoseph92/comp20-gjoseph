@@ -1,17 +1,20 @@
 body {
 	margin: 0;
 	font-family: Helvetica, sans-serif;
+	background-color: #191815;
+	color: #F2DE7A;
 }
 
 td {
 	vertical-align: text-bottom;
-	padding: 3px;
-	margin: 0px;
+	padding: 20px 3px;
 }
-
 td > * {
 	margin: 0px;
 }
+h1 { font-size: 48px; }
+h2 { font-size: 30px; }
+body { font-size: 18px; }
 
 .leftCol {
 	text-align: right;
@@ -23,11 +26,14 @@ td > * {
 }
 .leftCol > * { margin-right: 15px; }
 .rightCol > * { margin-left: 15px; }
-.locationRow > td > * { margin-bottom: 25px; }
+
+.company { color: #EA9B16; }
+.position { color: #5D9644}
+.jobRow > td { border-bottom: 1px dotted #394949; }
 
 #list {
-	width: 75%;
-	margin: 3% auto;
+	width: 85%;
+	margin: 4% auto;
 }
 #jobsTable {
 	width: 100%;
