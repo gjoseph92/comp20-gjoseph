@@ -6,6 +6,12 @@ function start_game() {
 		sprites.src = "assets/frogger_sprites.png";
 		sprite_width = sprites.width;	//???
 		
+		//Globals
+		level = 1;
+		lives = 3;
+		score = 0;
+		highscore = 0;	//for now
+		
 		drawBackground();
 	}
 	else {
@@ -24,7 +30,7 @@ function drawBackground() {
 	
 	//level elements
 	drawWater(0, 274);
-	drawRoadBG(274, 510);
+	drawRoadBG(274, 530);
 	drawLily(57);
 	
 	drawOverlays(); //Header and footer
@@ -36,18 +42,30 @@ function drawWater(y_start, y_end) {
 	ctx.fillRect(0, y_start, canvas.width, y_end - y_start);
 	ctx.restore();
 }
-
 function drawRoadBG(y_start, y_end) {
 	ctx.save();
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0, y_start, canvas.width, y_end - y_start);
-	ctx.drawImage(sprites, 0, 120, 399, 33, 0, y_start, 399, 33);
-	ctx.drawImage(sprites, 0, 120, 399, 33, 0, y_end - 33, 399, 33);
+	ctx.drawImage(sprites, 0, 120, 399, 33, 0, y_start, 399, 33);	//upper road
+	ctx.drawImage(sprites, 0, 120, 399, 33, 0, y_end - 33, 399, 33);	//lower road
 	ctx.restore();
 }
-
 function drawLily(y) {
 	ctx.drawImage(sprites, 0, 55, 399, 53, 0, y, 399, 53);
 }
 
-function drawOverlays() { }
+function drawOverlays() {
+	ctx.drawImage(sprites, 14, 12, 323, 31, 14, 12, 323, 31);	//Frogger title
+	ctx.save();
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0, canvas.height - 35, canvas.width, 35);	//bottom bar
+	ctx.fillStyle = 'LimeGreen';
+	ctx.font = "bold 24px Helvetica";
+	ctx.fillText('Level ' + level, 58, canvas.height - 15);
+	ctx.font = "bold 12px Helvetica";
+	ctx.fillText('Score: ' + score, 0, canvas.height - 2);
+	ctx.fillText('Highscore: ' + highscore, 78, canvas.height - 2);
+	for (var i = 0; i < lives; i++)		//draw lives as frogs
+		ctx.drawImage(sprites, 13, 334, 17, 23, i * 19, canvas.height - 35, 17, 23);
+	ctx.restore();
+}
