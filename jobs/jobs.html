@@ -6,59 +6,78 @@
 <title>Friends of Ming Chow Jobs Listing</title>
 <link rel="stylesheet" href="jobs.css" media="screen">
 <script>
-	function getJSON() {
-		try {
-			xmlhttp = new XMLHttpRequest();
-			xmlhttp.open('GET', 'http://messagehub.herokuapp.com/lab8.json', false);
-			xmlhttp.send();
-			return JSON.parse(xmlhttp.responseText);
-		}
-		catch (err) {
-			return null;
+	var triesRemaining = 5;
+	function buildPage() {
+		if (triesRemaining > 0) {
+			try {
+				xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						displayJobs( JSON.parse(xmlhttp.responseText) );
+						triesRemaining = 0;
+					}
+					else if (xmlhttp.readyState == 4 && xmlhttp.status == 404)
+						buildPage();
+				}
+			
+				xmlhttp.open('GET', 'http://messagehub.herokuapp.com/lab8.json', true);
+				xmlhttp.send();
+			}
+			catch (err) {
+				error = document.createElement('h2');
+				error.textContent = "Grr. Your browser doesn&apos;t support AJAX.";
+				document.getElementById('list').appendChild(error);
+			}
+			triesRemaining--;
+		} else {
+			error = document.createElement('h1');
+			sub_error = document.createElement('h2');
+			error.textContent = "What the 404?";
+			sub_error.textContent = "We can't reach the jobs data. Oops!";
+			document.getElementById('list').appendChild(error);
+			document.getElementById('list').appendChild(sub_error);
 		}
     }
-function parse() {
-	jobs = getJSON();
+	function displayJobs(jobs) {
+		jobsTable = document.createElement('table');
+		jobsTable.setAttribute('border', '0');
+		jobsTable.setAttribute('id', 'jobsTable');
 	
-	jobsTable = document.createElement('table');
-	jobsTable.setAttribute('border', '0');
-	jobsTable.setAttribute('id', 'jobsTable');
-	
-	for (var i = 0; i < jobs.length; i++) {
-		var jobRow = document.createElement('tr');
-		var companyCol = document.createElement('td');
-		var positionCol = document.createElement('td');
-		jobRow.setAttribute('class', 'jobRow');
-		companyCol.setAttribute('class', 'leftCol');
-		positionCol.setAttribute('class', 'rightCol');
+		for (var i = 0; i < jobs.length; i++) {
+			var jobRow = document.createElement('tr');
+			var companyCol = document.createElement('td');
+			var positionCol = document.createElement('td');
+			jobRow.setAttribute('class', 'jobRow');
+			companyCol.setAttribute('class', 'leftCol');
+			positionCol.setAttribute('class', 'rightCol');
 		
-		var company = document.createElement('h1');
-		var location = document.createElement('p');
-		var position = document.createElement('h2');
+			var company = document.createElement('h1');
+			var location = document.createElement('p');
+			var position = document.createElement('h2');
 		
-		company.setAttribute('class', 'company');
-		location.setAttribute('class', 'location');
-		position.setAttribute('class', 'position');
+			company.setAttribute('class', 'company');
+			location.setAttribute('class', 'location');
+			position.setAttribute('class', 'position');
 		
-		companyCol.appendChild(company);
-		companyCol.appendChild(location);
-		positionCol.appendChild(position);
+			companyCol.appendChild(company);
+			companyCol.appendChild(location);
+			positionCol.appendChild(position);
 		
-		jobRow.appendChild(companyCol);
-		jobRow.appendChild(positionCol);
-		jobsTable.appendChild(jobRow);
+			jobRow.appendChild(companyCol);
+			jobRow.appendChild(positionCol);
+			jobsTable.appendChild(jobRow);
 		
-		var job = jobs[i];
-		company.textContent = job.company;
-		location.textContent = job.location;
-		position.textContent = job.position;
-	}
-	document.getElementById('list').appendChild(jobsTable);
+			var job = jobs[i];
+			company.textContent = job.company;
+			location.textContent = job.location;
+			position.textContent = job.position;
+		}
+		document.getElementById('list').appendChild(jobsTable);
 }
 </script>
 </head>
 
-<body onload="parse();">
+<body onload="buildPage();">
 <div id="list"></div>
 </body>
 
