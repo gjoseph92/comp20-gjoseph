@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
    <head>
+	   <title>Where In The World?</title>
 	   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-	   <link rel="stylesheet" href="where.css" media="screen">
+	   <link rel="stylesheet" href="index.css" media="screen">
+	   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
 	   <script src="where.js"></script>
    </head>
-   <body>
-
+   <body onload="init_map();">
+	   <div id="map_canvas"></div>
    </body>
 </html>
