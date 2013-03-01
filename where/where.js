@@ -20,28 +20,26 @@ function init_map() {
 	redlineAJAX.onFail = function() { console.log('poop! 404!'); };
 	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
 	redlineAJAX.send();
-	
-	console.log(stations.length);
 }
 
 function showStations() {
-	for (var station in stations) {
-		//console.log('hi');
-		station = stations[station];
-		var lon_str = station[0].stop_lon;		//Why is stop_lon undefined??
+	for (var stationName in stations) {
+		station = stations[stationName];
+		var lon_str = station[0].stop_lon;
 		var lon = parseFloat(lon_str);
 		var pos = new google.maps.LatLng(parseFloat(station[0].stop_lat), lon);
 		var marker = new google.maps.Marker({
 			position: pos,
 			map: map,
-			title: station[0].StationName
+			title: station[0].stop_name
 		});
-		station["marker"] = marker;
+		stations[stationName]["marker"] = marker;
 	}
 }
 
 function buildStationsArrFromCSV(responseText) {
 	var stationsCsv = responseText.split('\n');
+	for (var line in stationsCsv) { stationsCsv[line] = stationsCsv[line].replace(/\r|\n/gm, ''); }	//remove annoying newlines
 	var headings = stationsCsv[0].split(',');
 	for (var i = 1; i < stationsCsv.length; i++) {
 		var values = stationsCsv[i].split(',');
@@ -49,11 +47,11 @@ function buildStationsArrFromCSV(responseText) {
 		for (var j = 0; j < headings.length; j++)	//build platform objects using fields listed in CSV header (row 0)
 			platform[ headings[j] ] = values[j];
 		if (platform.Line == 'Red') {	//only take the red line
-			if (stations[ platform.StationName ] == null)	//store platforms in an array
-				stations[ platform.StationName ] = [platform];
+			if (stations[ platform.stop_name ] == null)	//store platforms in an array
+				stations[ platform.stop_name ] = [platform];
 			else
-				if (platform.Direction == 'NB') stations[platform.StationName].unshift(platform);	//put NB stations first in platforms array
-				else stations[platform.StationName].push(platform);
+				if (platform.Direction == 'NB') stations[platform.stop_name].unshift(platform);	//put NB stations first in platforms array
+				else stations[platform.stop_name].push(platform);
 		}
 	}
 	showStations();
