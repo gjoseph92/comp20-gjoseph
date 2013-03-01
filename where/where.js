@@ -1,5 +1,3 @@
-stations = [];
-
 function init_map() {
 	tuftsLatLng = new google.maps.LatLng(42.40546, -71.117764);
 	var mapOptions = {
@@ -10,6 +8,7 @@ function init_map() {
 	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 	google.maps.event.addListener(map, 'click', addClickMarker);
 
+	stations = [];
 	var stationsAJAX = new XMLHttpRequestRetryer(2);
 	stationsAJAX.onSuccess = function(responseText) {
 		var stationsCsv = responseText.split('\n');
@@ -17,10 +16,15 @@ function init_map() {
 		//stations = [];
 		for (var i = 1; i < stationsCsv.length; i++) {
 			var values = stationsCsv[i].split(',');
-			var station = new Object();
-			for (var j = 0; j < headings.length; j++)
-				station[ headings[j] ] = values[j];
-			stations[ station.PlatformKey ] = station;
+			var platform = new Object();
+			for (var j = 0; j < headings.length; j++)	//build platform objects using fields listed in CSV header (row 0)
+				platform[ headings[j] ] = values[j];
+			if (stations[ platform.StationName ] == null) {	//store platforms in 'station' (each platform reachable by its direction)
+				var station = [];
+				station[ platform.Direction ] = platform;
+				stations[ platform.StationName ] = station;
+			} else
+				stations[platform.StationName][platform.Direction] = platform;
 		}
 	};
 	stationsAJAX.onFail = function() { console.log('poop! cant get the stations!'); };
