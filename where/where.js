@@ -36,14 +36,23 @@ function showStations(csvResponseText) {
 			map: map,
 			title: stationName
 		});
-		google.maps.event.addListener(marker, 'click', function() {
-			console.log(this.getTitle())
-			infoWindow.open(map, this);
-			infoWindow.setContent(this.getTitle());
-		});
+		setMarkerCallback(marker);
 		stations[stationName]["marker"] = marker;
 	}
 	drawRedline();
+}
+
+function setMarkerCallback(marker) {						    //A separate function so each closure keeps its own marker
+	google.maps.event.addListener(marker, 'click', function() {	//instead of all taking the last one in the loop
+		var stationName = marker.getTitle();
+		var platforms = stations[stationName];
+		var platformNames = [];
+		for (var i = 0; i < platforms.length; i++)
+			platformNames.push(platforms[i].PlatformName);
+		
+		infoWindow.setContent(platformNames.join(', '));
+		infoWindow.open(map, marker);
+	});
 }
 
 function drawRedline() {
