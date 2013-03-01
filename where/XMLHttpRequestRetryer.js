@@ -38,3 +38,5 @@ XMLHttpRequestRetryer.prototype.send = function() {
 	};
 	this.xmlhttp.send();
 }
+
+//TODO: null checking for functions
