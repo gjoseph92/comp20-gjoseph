@@ -10,7 +10,7 @@ function init_map() {
 	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 
 	var stationsAJAX = new XMLHttpRequestRetryer(2);
-	stationsAJAX.onSuccess = buildStationsArrFromCSV;
+	stationsAJAX.onSuccess = showStations;
 	stationsAJAX.onFail = function() { console.log('poop! cant get the stations!'); };
 	stationsAJAX.open('GET', 'http://developer.mbta.com/RT_Archive/RealTimeHeavyRailKeys.csv', true);
 	stationsAJAX.send();
@@ -22,7 +22,8 @@ function init_map() {
 	redlineAJAX.send();
 }
 
-function showStations() {
+function showStations(csvResponseText) {
+	buildStationsArrFromCSV(csvResponseText);
 	//draw markers
 	for (var stationName in stations) {
 		station = stations[stationName];
@@ -60,7 +61,7 @@ function drawRedline() {
 }
 
 function buildStationsArrFromCSV(responseText) {
-	stationsCsv = responseText.split(/[\n|\r]+/);	//newlines take many forms
+	var stationsCsv = responseText.split(/[\n|\r]+/);	//newlines take many forms
 	var headings = stationsCsv[0].split(',');
 	for (var i = 1; i < stationsCsv.length; i++) {
 		var values = stationsCsv[i].split(',');
@@ -75,5 +76,4 @@ function buildStationsArrFromCSV(responseText) {
 				else stations[platform.stop_name].push(platform);
 		}
 	}
-	showStations();
 }
