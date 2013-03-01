@@ -8,6 +8,10 @@ function init_map() {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+	
+	infoWindow = new google.maps.InfoWindow({
+		content: 'Station Info'
+	});
 
 	var stationsAJAX = new XMLHttpRequestRetryer(2);
 	stationsAJAX.onSuccess = showStations;
@@ -30,7 +34,12 @@ function showStations(csvResponseText) {
 		var marker = new google.maps.Marker({
 			position: new google.maps.LatLng(parseFloat(station[0].stop_lat), parseFloat(station[0].stop_lon)),
 			map: map,
-			title: station[0].stop_name
+			title: stationName
+		});
+		google.maps.event.addListener(marker, 'click', function() {
+			console.log(this.getTitle())
+			infoWindow.open(map, this);
+			infoWindow.setContent(this.getTitle());
 		});
 		stations[stationName]["marker"] = marker;
 	}
