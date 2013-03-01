@@ -1,4 +1,5 @@
 stations = {};
+platformTimes = {};
 
 function init_map() {
 	tuftsLatLng = new google.maps.LatLng(42.40546, -71.117764);
@@ -46,11 +47,17 @@ function setMarkerCallback(marker) {						    //A separate function so each clos
 	google.maps.event.addListener(marker, 'click', function() {	//instead of all taking the last one in the loop
 		var stationName = marker.getTitle();
 		var platforms = stations[stationName];
-		var platformNames = [];
-		for (var i = 0; i < platforms.length; i++)
-			platformNames.push(platforms[i].PlatformName);
-		
-		infoWindow.setContent(platformNames.join(', '));
+		var contents = document.createElement('div');
+		for (var i = 0; i < platforms.length; i++) {
+			var col_div = document.createElement('div');
+			col_div.className = 'platform_div';
+			var title = document.createElement('h4');
+			title.textContent = platforms[i].PlatformName;
+			col_div.appendChild(title);
+			contents.appendChild(col_div);
+		}
+
+		infoWindow.setContent(contents);
 		infoWindow.open(map, marker);
 	});
 }
