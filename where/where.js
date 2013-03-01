@@ -21,7 +21,7 @@ function init_map() {
 	stationsAJAX.send();
 
 	var redlineAJAX = new XMLHttpRequestRetryer(5);
-	redlineAJAX.onSuccess = function(responseText) { json = JSON.parse(responseText); console.log('got the json. yeah.'); };
+	redlineAJAX.onSuccess = buildPlatformTimesFromJSON;
 	redlineAJAX.onFail = function() { console.log('poop! 404!'); };
 	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
 	redlineAJAX.send();
@@ -99,6 +99,22 @@ function buildStationsArrFromCSV(responseText) {
 			else
 				if (platform.Direction == 'NB') stations[platform.stop_name].unshift(platform);	//put NB stations first in platforms array
 				else stations[platform.stop_name].push(platform);
+		}
+	}
+}
+
+function buildPlatformTimesFromJSON(responseText) {
+	json = JSON.parse(responseText);
+	for (var i = 0; i < json.length; i++) {
+		var train = json[i];
+		if (train.Line == 'Red' && train.InformationType == 'Predicted') {
+			var trainInfo = {
+				time: train.Time,
+				timeRemaining: train.TimeRemaining,		//TODO: format times here
+				platformKey: train.PlatformKey
+			};
+			if (platformTimes[train.PlatformKey] == null) platformTimes[train.PlatformKey] = [];
+			platformTimes[train.PlatformKey].push(trainInfo);
 		}
 	}
 }
