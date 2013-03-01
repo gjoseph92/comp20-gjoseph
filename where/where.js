@@ -1,32 +1,16 @@
+stations = {};
+
 function init_map() {
 	tuftsLatLng = new google.maps.LatLng(42.40546, -71.117764);
 	var mapOptions = {
-		zoom: 8,
+		zoom: 11,
 		center: tuftsLatLng,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-	google.maps.event.addListener(map, 'click', addClickMarker);
 
-	stations = [];
 	var stationsAJAX = new XMLHttpRequestRetryer(2);
-	stationsAJAX.onSuccess = function(responseText) {
-		var stationsCsv = responseText.split('\n');
-		var headings = stationsCsv[0].split(',');
-		//stations = [];
-		for (var i = 1; i < stationsCsv.length; i++) {
-			var values = stationsCsv[i].split(',');
-			var platform = new Object();
-			for (var j = 0; j < headings.length; j++)	//build platform objects using fields listed in CSV header (row 0)
-				platform[ headings[j] ] = values[j];
-			if (stations[ platform.StationName ] == null) {	//store platforms in 'station' (each platform reachable by its direction)
-				var station = [];
-				station[ platform.Direction ] = platform;
-				stations[ platform.StationName ] = station;
-			} else
-				stations[platform.StationName][platform.Direction] = platform;
-		}
-	};
+	stationsAJAX.onSuccess = buildStationsArrFromCSV;
 	stationsAJAX.onFail = function() { console.log('poop! cant get the stations!'); };
 	stationsAJAX.open('GET', 'http://developer.mbta.com/RT_Archive/RealTimeHeavyRailKeys.csv', true);
 	stationsAJAX.send();
@@ -36,25 +20,41 @@ function init_map() {
 	redlineAJAX.onFail = function() { console.log('poop! 404!'); };
 	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
 	redlineAJAX.send();
+	
+	console.log(stations.length);
 }
 
-function addClickMarker(event) {
-	marker = new google.maps.Marker( {
-		position: event.latLng,
-		draggable: true,
-		map: map,
-		animation: google.maps.Animation.DROP
-	});
-	marker.setTitle(Math.random().toString());
-}
-/*
-function getScheduleJSON(onComplete) {
-	xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
-			onComplete( JSON.parse(xmlhttp.responseText) );
+function showStations() {
+	for (var station in stations) {
+		//console.log('hi');
+		station = stations[station];
+		var lon_str = station[0].stop_lon;		//Why is stop_lon undefined??
+		var lon = parseFloat(lon_str);
+		var pos = new google.maps.LatLng(parseFloat(station[0].stop_lat), lon);
+		var marker = new google.maps.Marker({
+			position: pos,
+			map: map,
+			title: station[0].StationName
+		});
+		station["marker"] = marker;
 	}
-	xmlhttp.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
-	xmlhttp.send();
 }
-*/
+
+function buildStationsArrFromCSV(responseText) {
+	var stationsCsv = responseText.split('\n');
+	var headings = stationsCsv[0].split(',');
+	for (var i = 1; i < stationsCsv.length; i++) {
+		var values = stationsCsv[i].split(',');
+		var platform = new Object();
+		for (var j = 0; j < headings.length; j++)	//build platform objects using fields listed in CSV header (row 0)
+			platform[ headings[j] ] = values[j];
+		if (platform.Line == 'Red') {	//only take the red line
+			if (stations[ platform.StationName ] == null)	//store platforms in an array
+				stations[ platform.StationName ] = [platform];
+			else
+				if (platform.Direction == 'NB') stations[platform.StationName].unshift(platform);	//put NB stations first in platforms array
+				else stations[platform.StationName].push(platform);
+		}
+	}
+	showStations();
+}
