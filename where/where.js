@@ -23,23 +23,44 @@ function init_map() {
 }
 
 function showStations() {
+	//draw markers
 	for (var stationName in stations) {
 		station = stations[stationName];
-		var lon_str = station[0].stop_lon;
-		var lon = parseFloat(lon_str);
-		var pos = new google.maps.LatLng(parseFloat(station[0].stop_lat), lon);
 		var marker = new google.maps.Marker({
-			position: pos,
+			position: new google.maps.LatLng(parseFloat(station[0].stop_lat), parseFloat(station[0].stop_lon)),
 			map: map,
 			title: station[0].stop_name
 		});
 		stations[stationName]["marker"] = marker;
 	}
+	drawRedline();
+}
+
+function drawRedline() {
+	var trunk = ['Alewife Station','Davis Station','Porter Square Station','Harvard Square Station','Central Square Station','Kendall/MIT Station','Charles/MGH Station','Park St. Station','Downtown Crossing Station','South Station','Broadway Station','Andrew Station','JFK/UMass Station','Savin Hill Station'];
+	var braintree = ['Savin Hill Station','North Quincy Station','Wollaston Station','Quincy Center Station','Quincy Adams Station','Braintree Station'];
+	var ashmont = ['Savin Hill Station','Fields Corner Station','Shawmut Station','Ashmont Station'];
+	var orderedBranches = [trunk, braintree, ashmont];
+	
+	for (var i = 0; i < orderedBranches.length; i++) {
+		var line = orderedBranches[i];
+		var points = [];
+		for (var j = 0; j < line.length; j++) {
+			var marker = stations[ line[j] ].marker;
+			points.push(marker.getPosition());
+		}
+		var polyLine = new google.maps.Polyline({
+			path: points,
+			strokeColor: "#d50c00",
+			strokeOpacity: 0.7,
+			strokeWeight: 3
+		});
+		polyLine.setMap(map);
+	}
 }
 
 function buildStationsArrFromCSV(responseText) {
-	var stationsCsv = responseText.split('\n');
-	for (var line in stationsCsv) { stationsCsv[line] = stationsCsv[line].replace(/\r|\n/gm, ''); }	//remove annoying newlines
+	stationsCsv = responseText.split(/[\n|\r]+/);	//newlines take many forms
 	var headings = stationsCsv[0].split(',');
 	for (var i = 1; i < stationsCsv.length; i++) {
 		var values = stationsCsv[i].split(',');
