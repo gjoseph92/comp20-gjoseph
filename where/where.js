@@ -4,7 +4,7 @@ platformTimes = {};
 function init_map() {
 	tuftsLatLng = new google.maps.LatLng(42.40546, -71.117764);
 	var mapOptions = {
-		zoom: 11,
+		zoom: 12,
 		center: tuftsLatLng,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
@@ -23,8 +23,14 @@ function init_map() {
 	var redlineAJAX = new XMLHttpRequestRetryer(5);
 	redlineAJAX.onSuccess = buildPlatformTimesFromJSON;
 	redlineAJAX.onFail = function() { console.log('poop! 404!'); };
-	redlineAJAX.open('GET', 'http://www.mbta.com/uploadedfiles/SampleRed.json', true);
+	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
 	redlineAJAX.send();
+	
+	var carmenWaldoAJAX = new XMLHttpRequestRetryer(5);
+	carmenWaldoAJAX.onSuccess = showCarmenWaldo;
+	carmenWaldoAJAX.onFail = function() { console.log('poop! carmen and waldo are sneaky!'); };
+	carmenWaldoAJAX.open('GET', 'http://messagehub.herokuapp.com/a3.json', true);
+	carmenWaldoAJAX.send();
 }
 
 function showStations(csvResponseText) {
@@ -60,9 +66,10 @@ function setMarkerCallback(marker) {						    //A separate function so each clos
 			timeList.className = 'timeList';
 			col_div.appendChild(timeList);
 			var times = platformTimes[platform.PlatformKey];
+			//console.log('platform '+i+' of '+stationName+' ('+platform.PlatformKey+'): '+times.length+' items.');
 			if (times != null) {
-				for (var i = 0; i < times.length; i++) {
-					var time = times[i].time;
+				for (var j = 0; j < times.length; j++) {
+					var time = times[j].time;
 					var timeItem = document.createElement('li');
 					timeItem.textContent = time;
 					timeList.appendChild(timeItem);
@@ -97,6 +104,32 @@ function drawRedline() {
 		});
 		polyLine.setMap(map);
 	}
+}
+
+function showCarmenWaldo(responseText) {
+	//try {
+		cwJson = JSON.parse(responseText);
+		for (var i in cwJson) {
+			var person = cwJson[i];
+			var latLng = new google.maps.LatLng(person.loc.latitude, person.loc.longitude);
+			var marker = new google.maps.Marker({
+				position: latLng,
+				map: map,
+				title: person.name
+			});
+			var listener = (function(person_ref) {
+				return function() {
+					infoWindow.setContent('<h3>' + person_ref.name + '</h3><p>' + person_ref.loc.note + '</p>');
+					infoWindow.open(map, this);
+				}
+			})(person)
+			google.maps.event.addListener(marker, 'click', listener);
+		}
+/*
+	} catch (err) {
+		console.log('Carmen and Waldo do not wish to be found, they are obfuscating their locations!');
+	}
+*/
 }
 
 function buildStationsArrFromCSV(responseText) {
