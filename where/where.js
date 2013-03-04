@@ -1,5 +1,6 @@
 stations = {};
 platformTimes = {};
+var posMarker;
 
 function init_map() {
 	tuftsLatLng = new google.maps.LatLng(42.40546, -71.117764);
@@ -31,6 +32,22 @@ function init_map() {
 	carmenWaldoAJAX.onFail = function() { console.log('poop! carmen and waldo are sneaky!'); };
 	carmenWaldoAJAX.open('GET', 'http://messagehub.herokuapp.com/a3.json', true);
 	carmenWaldoAJAX.send();
+	
+	if (navigator.geolocation) {
+		navigator.geolocation.watchPosition(function(position) {
+			var location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+			if (posMarker == null)
+				posMarker = new google.maps.Marker({
+					position: location,
+					map: map,
+					title: 'You are here'
+				});
+			else
+				posMarker.setPosition(location);
+		});
+	}
+	else
+		alert("Your browser doesn't support geolocation.");
 }
 
 function showStations(csvResponseText) {
