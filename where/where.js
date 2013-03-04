@@ -38,10 +38,12 @@ function showStations(csvResponseText) {
 	//draw markers
 	for (var stationName in stations) {
 		station = stations[stationName];
+		var icon = 'mbta_small.png'
 		var marker = new google.maps.Marker({
 			position: new google.maps.LatLng(parseFloat(station[0].stop_lat), parseFloat(station[0].stop_lon)),
 			map: map,
-			title: stationName
+			title: stationName,
+			icon: icon
 		});
 		setMarkerCallback(marker);
 		stations[stationName]["marker"] = marker;
@@ -112,10 +114,12 @@ function showCarmenWaldo(responseText) {
 		for (var i in cwJson) {
 			var person = cwJson[i];
 			var latLng = new google.maps.LatLng(person.loc.latitude, person.loc.longitude);
+			var icon = (person.name == 'Waldo') ? 'waldo.png' : 'carmen.png';
 			var marker = new google.maps.Marker({
 				position: latLng,
 				map: map,
-				title: person.name
+				title: person.name,
+				icon: icon
 			});
 			var listener = (function(person_ref) {
 				return function() {
