@@ -17,7 +17,7 @@ function init_map() {
 	var stationsAJAX = new XMLHttpRequestRetryer(2);
 	stationsAJAX.onSuccess = showStations;
 	stationsAJAX.onFail = function() { console.log('poop! cant get the stations!'); };
-	stationsAJAX.open('GET', 'http://developer.mbta.com/RT_Archive/RealTimeHeavyRailKeys.csv', true);
+	stationsAJAX.open('GET', 'stations.json', true);
 	stationsAJAX.send();
 
 	var redlineAJAX = new XMLHttpRequestRetryer(5);
@@ -26,7 +26,7 @@ function init_map() {
 	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
 	redlineAJAX.send();
 	
-	var carmenWaldoAJAX = new XMLHttpRequestRetryer(5);
+	var carmenWaldoAJAX = new XMLHttpRequestRetryer(10);
 	carmenWaldoAJAX.onSuccess = showCarmenWaldo;
 	carmenWaldoAJAX.onFail = function() { console.log('poop! carmen and waldo are sneaky!'); };
 	carmenWaldoAJAX.open('GET', 'http://messagehub.herokuapp.com/a3.json', true);
@@ -34,7 +34,7 @@ function init_map() {
 }
 
 function showStations(csvResponseText) {
-	buildStationsArrFromCSV(csvResponseText);
+	stations = JSON.parse(csvResponseText);
 	//draw markers
 	for (var stationName in stations) {
 		station = stations[stationName];
@@ -134,33 +134,6 @@ function showCarmenWaldo(responseText) {
 		console.log('Carmen and Waldo do not wish to be found, they are obfuscating their locations!');
 	}
 */
-}
-
-function buildStationsArrFromCSV(responseText) {
-	var stationsCsv = responseText.split(/[\n|\r]+/);	//newlines take many forms
-	var headings = stationsCsv[0].split(',');
-	for (var i = 1; i < stationsCsv.length; i++) {
-		var values = stationsCsv[i].split(',');
-		var platform_in = new Object();
-		for (var j = 0; j < headings.length; j++)	//build platform objects using fields listed in CSV header (row 0)
-			platform_in[ headings[j] ] = values[j];
-		var platform = {
-			PlatformKey: platform_in.PlatformKey,
-			PlatformName: platform_in.PlatformName,
-			Direction: platform_in.Direction,
-			stop_name: platform_in.stop_name,
-			stop_lat: platform_in.stop_lat,
-			stop_lon: platform_in.stop_lon
-		};
-		if (platform_in.Line == 'Red') {	//only take the red line
-			if (stations[ platform.stop_name ] == null)	//store platforms in an array
-				stations[ platform.stop_name ] = [platform];
-			else
-				if (platform.Direction == 'NB') stations[platform.stop_name].unshift(platform);	//put NB stations first in platforms array
-				else stations[platform.stop_name].push(platform);
-		}
-	}
-	stationJSONstr = JSON.stringify(stations);
 }
 
 function buildPlatformTimesFromJSON(responseText) {
