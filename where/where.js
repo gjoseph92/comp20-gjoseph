@@ -23,7 +23,7 @@ function init_map() {
 	var redlineAJAX = new XMLHttpRequestRetryer(5);
 	redlineAJAX.onSuccess = buildPlatformTimesFromJSON;
 	redlineAJAX.onFail = function() { console.log('poop! 404!'); };
-	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
+	redlineAJAX.open('GET', 'http://www.mbta.com/uploadedfiles/SampleRed.json', true);
 	redlineAJAX.send();
 }
 
@@ -49,11 +49,25 @@ function setMarkerCallback(marker) {						    //A separate function so each clos
 		var platforms = stations[stationName];
 		var contents = document.createElement('div');
 		for (var i = 0; i < platforms.length; i++) {
+			var platform = platforms[i];
 			var col_div = document.createElement('div');
 			col_div.className = 'platform_div';
 			var title = document.createElement('h4');
-			title.textContent = platforms[i].PlatformName;
+			title.textContent = platform.PlatformName;
 			col_div.appendChild(title);
+			
+			var timeList = document.createElement('ul');
+			timeList.className = 'timeList';
+			col_div.appendChild(timeList);
+			var times = platformTimes[platform.PlatformKey];
+			if (times != null) {
+				for (var i = 0; i < times.length; i++) {
+					var time = times[i].time;
+					var timeItem = document.createElement('li');
+					timeItem.textContent = time;
+					timeList.appendChild(timeItem);
+				}
+			}
 			contents.appendChild(col_div);
 		}
 
@@ -114,7 +128,7 @@ function buildPlatformTimesFromJSON(responseText) {
 				platformKey: train.PlatformKey
 			};
 			if (platformTimes[train.PlatformKey] == null) platformTimes[train.PlatformKey] = [];
-			platformTimes[train.PlatformKey].push(trainInfo);
+			platformTimes[train.PlatformKey].push(trainInfo);	//TODO: sort times here
 		}
 	}
 }
