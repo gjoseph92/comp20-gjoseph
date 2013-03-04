@@ -141,10 +141,18 @@ function buildStationsArrFromCSV(responseText) {
 	var headings = stationsCsv[0].split(',');
 	for (var i = 1; i < stationsCsv.length; i++) {
 		var values = stationsCsv[i].split(',');
-		var platform = new Object();
+		var platform_in = new Object();
 		for (var j = 0; j < headings.length; j++)	//build platform objects using fields listed in CSV header (row 0)
-			platform[ headings[j] ] = values[j];
-		if (platform.Line == 'Red') {	//only take the red line
+			platform_in[ headings[j] ] = values[j];
+		var platform = {
+			PlatformKey: platform_in.PlatformKey,
+			PlatformName: platform_in.PlatformName,
+			Direction: platform_in.Direction,
+			stop_name: platform_in.stop_name,
+			stop_lat: platform_in.stop_lat,
+			stop_lon: platform_in.stop_lon
+		};
+		if (platform_in.Line == 'Red') {	//only take the red line
 			if (stations[ platform.stop_name ] == null)	//store platforms in an array
 				stations[ platform.stop_name ] = [platform];
 			else
@@ -152,6 +160,7 @@ function buildStationsArrFromCSV(responseText) {
 				else stations[platform.stop_name].push(platform);
 		}
 	}
+	stationJSONstr = JSON.stringify(stations);
 }
 
 function buildPlatformTimesFromJSON(responseText) {
