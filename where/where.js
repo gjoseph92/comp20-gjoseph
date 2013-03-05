@@ -45,6 +45,8 @@ function init_map() {
 				});
 			else
 				posMarker.setPosition(location);
+			
+			//Calculate and display Carmen & Waldo distances
 			var dist_overlay = document.getElementById('dist_overlay');
 			if (carmen_waldo_markers.length > 0) {
 				dist_overlay.style.visibility = 'visible';
@@ -58,6 +60,14 @@ function init_map() {
 									 '<p>' + (distance*0.000621371).toPrecision(1) + ' miles</p>';
 				dist_overlay.appendChild(dist_row);
 			}
+			
+			//Find closest station and prepare info window for user's current location marker
+			var closest = findClosestStation(posMarker.getPosition());
+			google.maps.event.addListener(posMarker, 'click', function() {
+				infoWindow.setContent('<h3>You are here.</h3><p>Nearest Red Line station: ' + closest.station_marker.getTitle() +
+									  ' (' + (closest.distance*0.000621371).toPrecision(1) + ' miles away)</p>');
+				infoWindow.open(map, posMarker);
+			});
 		});
 	}
 	else
@@ -157,7 +167,7 @@ function showCarmenWaldo(responseText) {
 					infoWindow.setContent('<h3>' + person_ref.name + '</h3><p>' + person_ref.loc.note + '</p>');
 					infoWindow.open(map, this);
 				}
-			})(person)
+			})(person);
 			google.maps.event.addListener(marker, 'click', listener);
 			carmen_waldo_markers.push(marker);
 		}
@@ -166,6 +176,21 @@ function showCarmenWaldo(responseText) {
 		console.log('Carmen and Waldo do not wish to be found, they are obfuscating their locations!');
 	}
 */
+}
+
+function findClosestStation(posLatLng) {
+	var min_dist = Infinity;
+	var min_station = null;
+	for (var s in stations) {
+		var station = stations[s];
+		var station_pos = station.marker.getPosition();
+		var dist = google.maps.geometry.spherical.computeDistanceBetween(posLatLng, station_pos);
+		if (dist < min_dist) {
+			min_dist = dist;
+			min_station = station.marker;
+		}
+	}
+	return { station_marker: min_station, distance: min_dist };
 }
 
 function buildPlatformTimesFromJSON(responseText) {
