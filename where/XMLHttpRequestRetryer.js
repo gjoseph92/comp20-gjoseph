@@ -25,12 +25,10 @@ XMLHttpRequestRetryer.prototype.send = function() {
 		if (retryer.xmlhttp.readyState == 4) {
 			if (retryer.xmlhttp.status == 200) {
 				retryer.triesRemaining = 0;
-				console.log('success with ' + retryer.params.url);
 				if (retryer.onSuccess) retryer.onSuccess( retryer.xmlhttp.responseText );
 			} else {
 				if (retryer.triesRemaining > 0) {
 					retryer.triesRemaining--;
-					console.log('retrying ' + retryer.params.url);
 					retryer.xmlhttp.open(retryer.params.method, retryer.params.url, retryer.params.async);
 					retryer.xmlhttp.send();
 				}

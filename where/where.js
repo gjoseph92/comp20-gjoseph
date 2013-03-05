@@ -195,12 +195,12 @@ function buildPlatformTimesFromJSON(responseText) {
 		var train = json[i];
 		if (train.Line == 'Red' && train.InformationType == 'Predicted') {
 			var trainInfo = {
-				time: train.Time,
-				timeRemaining: train.TimeRemaining,		//TODO: format times here
+				time: train.Time.match(/[0-9]+:[0-9]+/) + ' ' + train.Time.match(/AM|PM/),
+				timeRemaining: train.TimeRemaining,
 				platformKey: train.PlatformKey
 			};
 			if (platformTimes[train.PlatformKey] == null) platformTimes[train.PlatformKey] = [];
-			platformTimes[train.PlatformKey].push(trainInfo);	//TODO: sort times here
+			platformTimes[train.PlatformKey].push(trainInfo);
 		}
 	}
 }
