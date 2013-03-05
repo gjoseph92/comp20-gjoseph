@@ -51,11 +51,11 @@ function init_map() {
 				dist_overlay.innerHTML = '';	//clear contents in case this is a location update
 			}
 			for (var i = 0; i < carmen_waldo_markers.length; i++) {
-				console.log(carmen_waldo_markers);
 				var marker = carmen_waldo_markers[i];
 				var dist_row = document.createElement('div');
+				var distance = google.maps.geometry.spherical.computeDistanceBetween(posMarker.getPosition(), marker.getPosition());
 				dist_row.innerHTML = '<img src="' + marker.getIcon() + '" alt="' + marker.getTitle() + '"/>' +
-									 '<p>' + 'DISTANCE' + '</p>';
+									 '<p>' + (distance*0.000621371).toPrecision(1) + ' miles</p>';
 				dist_overlay.appendChild(dist_row);
 			}
 		});
