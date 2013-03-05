@@ -16,7 +16,7 @@ XMLHttpRequestRetryer.prototype.setTries = function(num) {
 	if (num > 0) this.triesRemaining = num;
 }
 XMLHttpRequestRetryer.prototype.open = function(method, url, async) {
-	this.params = { method: method, url: url, async: async };
+	this.params = { method: method, url: url, async: async, tries: this.triesRemaining};
 	this.xmlhttp.open(method, url, async);
 }
 XMLHttpRequestRetryer.prototype.send = function() {
@@ -25,18 +25,28 @@ XMLHttpRequestRetryer.prototype.send = function() {
 		if (retryer.xmlhttp.readyState == 4) {
 			if (retryer.xmlhttp.status == 200) {
 				retryer.triesRemaining = 0;
-				retryer.onSuccess( retryer.xmlhttp.responseText );
+				console.log('success with ' + retryer.params.url);
+				if (retryer.onSuccess) retryer.onSuccess( retryer.xmlhttp.responseText );
 			} else {
 				if (retryer.triesRemaining > 0) {
 					retryer.triesRemaining--;
+					console.log('retrying ' + retryer.params.url);
 					retryer.xmlhttp.open(retryer.params.method, retryer.params.url, retryer.params.async);
 					retryer.xmlhttp.send();
 				}
-				else retryer.onFail();
+				else if (retryer.onFail) retryer.onFail();
 			}
 		}
 	};
 	this.xmlhttp.send();
+}
+XMLHttpRequestRetryer.prototype.retry = function() {
+	if (this.params) {
+		this.xmlhttp.open(this.params.method, this.params.url, this.params.async);
+		this.triesRemaining = this.params.triesRemaining;
+		this.xmlhttp.send();
+	} else
+		console.log('XMLHttpRequestRetryer must be opened before it can be retried');
 }
 
 //TODO: null checking for functions

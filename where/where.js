@@ -18,19 +18,18 @@ function init_map() {
 
 	var stationsAJAX = new XMLHttpRequestRetryer(2);
 	stationsAJAX.onSuccess = showStations;
-	stationsAJAX.onFail = function() { console.log('poop! cant get the stations!'); };
 	stationsAJAX.open('GET', 'stations.json', true);
 	stationsAJAX.send();
 
 	var redlineAJAX = new XMLHttpRequestRetryer(5);
 	redlineAJAX.onSuccess = buildPlatformTimesFromJSON;
-	redlineAJAX.onFail = function() { console.log('poop! 404!'); };
+	redlineAJAX.onFail = function() { console.log('Unable to access current Red Line times!'); };
 	redlineAJAX.open('GET', 'http://mbtamap-cedar.herokuapp.com/mapper/redline.json', true);
 	redlineAJAX.send();
 	
 	var carmenWaldoAJAX = new XMLHttpRequestRetryer(10);
 	carmenWaldoAJAX.onSuccess = showCarmenWaldo;
-	carmenWaldoAJAX.onFail = function() { console.log('poop! carmen and waldo are sneaky!'); };
+	carmenWaldoAJAX.onFail = function() { console.log('Carmen and Waldo are sneaky! Their location cannot be found'); };
 	carmenWaldoAJAX.open('GET', 'http://messagehub.herokuapp.com/a3.json', true);
 	carmenWaldoAJAX.send();
 	
@@ -109,7 +108,6 @@ function setMarkerCallback(marker) {						    //A separate function so each clos
 			timeList.className = 'timeList';
 			col_div.appendChild(timeList);
 			var times = platformTimes[platform.PlatformKey];
-			//console.log('platform '+i+' of '+stationName+' ('+platform.PlatformKey+'): '+times.length+' items.');
 			if (times != null) {
 				for (var j = 0; j < times.length; j++) {
 					var time = times[j].time;
@@ -150,8 +148,10 @@ function drawRedline() {
 }
 
 function showCarmenWaldo(responseText) {
-	//try {
-		cwJson = JSON.parse(responseText);
+	cwJson = JSON.parse(responseText);
+	if (cwJson.length == 0)
+		this.retry();
+	else {
 		for (var i in cwJson) {
 			var person = cwJson[i];
 			var latLng = new google.maps.LatLng(person.loc.latitude, person.loc.longitude);
@@ -171,11 +171,7 @@ function showCarmenWaldo(responseText) {
 			google.maps.event.addListener(marker, 'click', listener);
 			carmen_waldo_markers.push(marker);
 		}
-/*
-	} catch (err) {
-		console.log('Carmen and Waldo do not wish to be found, they are obfuscating their locations!');
 	}
-*/
 }
 
 function findClosestStation(posLatLng) {
