@@ -1,5 +1,6 @@
 stations = {};
 platformTimes = {};
+carmen_waldo_markers = [];
 var posMarker;
 
 function init_map() {
@@ -44,6 +45,19 @@ function init_map() {
 				});
 			else
 				posMarker.setPosition(location);
+			var dist_overlay = document.getElementById('dist_overlay');
+			if (carmen_waldo_markers.length > 0) {
+				dist_overlay.style.visibility = 'visible';
+				dist_overlay.innerHTML = '';	//clear contents in case this is a location update
+			}
+			for (var i = 0; i < carmen_waldo_markers.length; i++) {
+				console.log(carmen_waldo_markers);
+				var marker = carmen_waldo_markers[i];
+				var dist_row = document.createElement('div');
+				dist_row.innerHTML = '<img src="' + marker.getIcon() + '" alt="' + marker.getTitle() + '"/>' +
+									 '<p>' + 'DISTANCE' + '</p>';
+				dist_overlay.appendChild(dist_row);
+			}
 		});
 	}
 	else
@@ -145,6 +159,7 @@ function showCarmenWaldo(responseText) {
 				}
 			})(person)
 			google.maps.event.addListener(marker, 'click', listener);
+			carmen_waldo_markers.push(marker);
 		}
 /*
 	} catch (err) {

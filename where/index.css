@@ -13,12 +13,23 @@ body {
 }
 #dist_overlay {
 	position: absolute;
-	width: 150px;
-	height: 60px;
+	padding: 7px;
 	right: 5px;
 	top: 30px;
 	background-color: rgba(0,0,0,0.5);
+	visibility: hidden;
 }
+#dist_overlay img {
+	float: left;
+	margin: 5px 15px 5px 5px;
+}
+#dist_overlay p {
+	float: left;
+	margin: 0px 5px;
+	margin-top: auto;
+	margin-bottom: auto;
+}
+#dist_overlay div { display: inline-block; }
 
 .platform_div {
 	width: 200px;
