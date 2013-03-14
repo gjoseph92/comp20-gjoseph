@@ -7,13 +7,28 @@
 <script>
 	function updateStatus() {		
 		dateObj = new Date();
-		date = dateObj.getMonth() + '/' + dateObj.getDay() + '/' + dateObj.getFullYear() + ' ' + leadZero(dateObj.getHours()) + ':' + leadZero(dateObj.getMinutes());
+		date = dateObj.getMonth()+1 + '/' + dateObj.getDate() + '/' + dateObj.getFullYear() + ' ' + leadZero(dateObj.getHours()) + ':' + leadZero(dateObj.getMinutes());
 		
-		status = document.getElementById("msg").value;
+		status = date + ' - ' + document.getElementById("msg").value;
+		localStorage[dateObj.getTime()] = status;
 		newStatus = document.createElement('p');
-		newStatus.textContent = date  + ' - ' + status;
+		newStatus.textContent = status;
 		firstStatus = document.getElementById("status").firstChild;
 		document.getElementById("status").insertBefore(newStatus, firstStatus);
+	}
+	
+	function showAllStatus() {
+		var statusIds = [];
+		for (var id in localStorage) {
+			if (localStorage[id].match(/ - /))
+				statusIds.push(id);
+		}
+		statusIds.sort();
+		var statusHtml = "";
+		for (var i = statusIds.length-1; i >= 0; i--)
+			statusHtml += '<p>' + localStorage[statusIds[i]] + '</p>';
+
+		document.getElementById("status").innerHTML = statusHtml;
 	}
 	
 	function leadZero(x) {
@@ -25,7 +40,7 @@
 </script>
 </head>
 
-<body>
+<body onload="showAllStatus()">
 	<h1>Fecebook</h1>
 	<div id="nav">
 		<ul>
