@@ -51,6 +51,33 @@ function LilyMat() {
 	this.x = canvas.width/2;
 }
 LilyMat.prototype = Object.create(GameObj.prototype);
+function Log() {
+	GameObj.call(this);
+	this.sprites = {
+		short : new SpriteSheetCoords(7, 230, 84, 21),
+		med : new SpriteSheetCoords(7, 198, 116, 21),
+		long : new SpriteSheetCoords(7, 166, 177, 21),
+	};
+}
+Log.prototype = Object.create(Log.prototype);
+function Car() {
+	GameObj.call(this);
+	this.sprites = {
+		car : new SpriteSheetCoords(10, 267, 28, 20, LEFT),
+		racecar : new SpriteSheetCoords(47, 265, 27, 24, RIGHT),
+		yellow_racer : new SpriteSheetCoords(82, 264, 24, 26, RIGHT),
+		truck : new SpriteSheetCoords(106, 302, 46, 18, RIGHT)
+	};
+}
+Car.prototype = Object.create(Car.prototype);
+function Frogger() {
+	GameObj.call(this);
+	this.sprites = {
+		jumping : new SpriteSheetCoords(13, 334, 17, 23, RIGHT),
+		sitting : new SpriteSheetCoords(43, 335, 25, 22, RIGHT),
+	};
+}
+Frogger.prototype = Object.create(Frogger.prototype);
 
 /////////////// GAME INITIALIZATION ///
 var canvas;
