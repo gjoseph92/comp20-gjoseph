@@ -45,7 +45,7 @@ GameObj.prototype.draw = function() {
 GameObj.prototype.boundingBox = function() {}
 
 /////////////// SPECIFIC TYPES AND CLASSES ///
-function LilyMat() {
+function LilyMat() {											//TODO: lily object probably won't be used
 	GameObj.call(this);
 	this.sprite = new SpriteSheetCoords(0, 55, 399, 53);
 	this.x = canvas.width/2;
@@ -59,25 +59,25 @@ function Log() {
 		long : new SpriteSheetCoords(7, 166, 177, 21),
 	};
 }
-Log.prototype = Object.create(Log.prototype);
+Log.prototype = Object.create(GameObj.prototype);
 function Car() {
 	GameObj.call(this);
 	this.sprites = {
 		car : new SpriteSheetCoords(10, 267, 28, 20, LEFT),
 		racecar : new SpriteSheetCoords(47, 265, 27, 24, RIGHT),
 		yellow_racer : new SpriteSheetCoords(82, 264, 24, 26, RIGHT),
-		truck : new SpriteSheetCoords(106, 302, 46, 18, RIGHT)
+		truck : new SpriteSheetCoords(106, 302, 46, 18, LEFT)
 	};
 }
-Car.prototype = Object.create(Car.prototype);
+Car.prototype = Object.create(GameObj.prototype);
 function Frogger() {
 	GameObj.call(this);
 	this.sprites = {
-		jumping : new SpriteSheetCoords(13, 334, 17, 23, RIGHT),
-		sitting : new SpriteSheetCoords(43, 335, 25, 22, RIGHT),
+		sitting : new SpriteSheetCoords(13, 334, 17, 23, RIGHT),
+		jumping : new SpriteSheetCoords(43, 335, 25, 22, RIGHT)
 	};
 }
-Frogger.prototype = Object.create(Frogger.prototype);
+Frogger.prototype = Object.create(GameObj.prototype);
 
 /////////////// GAME INITIALIZATION ///
 var canvas;
@@ -98,11 +98,22 @@ function start_game() {
 			score = 0;
 			highscore = 0;	//for now
 			
+			objects = initLevelObjects();
+			var frogger = new Frogger();
+			frogger.sprite = frogger.sprites.sitting;
+			frogger.x = 199; frogger.y = 515;
+			frogger.direction = UP;
+			objects.push(frogger);
+			
+			var intervalID = setInterval(draw, 35);
+			
+/*
 			drawBackground();
 			drawFrog(199, 515, 'up', 'sit');
 			drawLog(100, 200, rand(1, 3));
 			drawCar(40, 400, rand(1,4), rand(1,4));
 			drawCar(250, 450, rand(1,4), rand(1,4));
+*/
 	}
 	}
 	else {
@@ -113,7 +124,39 @@ function start_game() {
 	}
 }
 
+/////////////// GAME LOOP ///
+function draw() {
+	drawBackground();
+	for (var i = 0; i < objects.length; i++) {
+		objects[i].x = objects[i].x + 4;
+		objects[i].draw();
+	}
+}
+
 /////////////// DRAW FUNCTIONS ///	(TODO: objectify)
+function initLevelObjects() {
+	var objects = [];
+	
+	var car = new Car();
+	car.sprite = car.sprites.car;
+	car.x = 40, car.y = 400;
+	car.direction = RIGHT;
+	objects.push(car);
+	
+	var truck = new Car();
+	truck.sprite = truck.sprites.truck;
+	truck.x = 250; truck.y = 450;
+	truck.direction = UP;
+	objects.push(truck);
+	
+	var log = new Log();
+	log.sprite = log.sprites.med;
+	log.x = 100; log.y = 200;
+	objects.push(log);
+	
+	return objects;
+}
+
 function drawBackground() {
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -121,10 +164,12 @@ function drawBackground() {
 	//Level elements
 	drawWater(0, 274);
 	drawRoadBG(274, 530);
-	//drawLily(57);
+	drawLily(57);
+/*
 	var lily = new LilyMat();
 	lily.y = 57 + lily.sprite.height/2;
 	lily.draw();
+*/
 	
 	drawOverlays(); //Header and footer
 }
