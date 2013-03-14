@@ -4,19 +4,21 @@ function start_game() {
 		ctx = canvas.getContext('2d');
 		sprites = new Image();
 		sprites.src = "assets/frogger_sprites.png";
-		sprite_width = sprites.width;	//???
-		
-		//Globals
-		level = 1;
-		lives = 3;
-		score = 0;
-		highscore = 0;	//for now
-		
-		drawBackground();
-		drawFrog(199, 515, 'up', 'sit');
-		drawLog(100, 200, rand(1, 3));
-		drawCar(40, 400, rand(1,4), rand(1,4));
-		drawCar(250, 450, rand(1,4), rand(1,4));
+		sprites.onload = function() {
+			sprite_width = sprites.width;	//???
+			
+			//Globals
+			level = 1;
+			lives = 3;
+			score = 0;
+			highscore = 0;	//for now
+			
+			drawBackground();
+			drawFrog(199, 515, 'up', 'sit');
+			drawLog(100, 200, rand(1, 3));
+			drawCar(40, 400, rand(1,4), rand(1,4));
+			drawCar(250, 450, rand(1,4), rand(1,4));
+	}
 	}
 	else {
 		error = document.createElement('h2');
