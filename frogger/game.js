@@ -4,7 +4,12 @@
 //
 // Convention: all coordinates are by an object's center, NOT upper-left corner
 
-/////////////// TYPES AND CLASSES ///
+var UP = -Math.PI/2;
+var DOWN = Math.PI/2;
+var LEFT = Math.PI;
+var RIGHT = 0;
+
+/////////////// ABSTRACT TYPES AND CLASSES ///
 function BoundingBox(ul, ur, ll, lr) {
 	this.ul = ul;
 	this.ur = ur;
@@ -13,22 +18,39 @@ function BoundingBox(ul, ur, ll, lr) {
 }
 BoundingBox.prototype.checkCollision = function(otherBoundingBox) {}
 
-function SpriteSheetCoords(x, y, width, height) {
+function SpriteSheetCoords(x, y, width, height, angle) {
 	this.x = x;
 	this.y = y;
 	this.width = width;
 	this.height = height;
+	this.angle = (arguments.length == 5) ? angle : RIGHT;
 }
 
 function GameObj() {
 	this.x = 0;
 	this.y = 0;
-	this.spriteSheetCoords = null;
+	this.direction = RIGHT;
+	this.sprite = null;
 	this.sprites = {};
 }
 GameObj.prototype.update = function() {}
-GameObj.prototype.draw = function() {}
+GameObj.prototype.draw = function() {
+	ctx.save();
+	ctx.translate(this.x, this.y);
+	ctx.rotate(this.direction - this.sprite.angle);
+	ctx.drawImage(spriteSheet, this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height,
+				  -this.sprite.width/2, -this.sprite.height/2, this.sprite.width, this.sprite.height);
+	ctx.restore();
+}
 GameObj.prototype.boundingBox = function() {}
+
+/////////////// SPECIFIC TYPES AND CLASSES ///
+function LilyMat() {
+	GameObj.call(this);
+	this.sprite = new SpriteSheetCoords(0, 55, 399, 53);
+	this.x = canvas.width/2;
+}
+LilyMat.prototype = Object.create(GameObj.prototype);
 
 /////////////// GAME INITIALIZATION ///
 var canvas;
@@ -39,13 +61,13 @@ function start_game() {
 	if (canvas.getContext) {
 		ctx = canvas.getContext('2d');
 		spriteSheet = new Image();
-		spriteSheet.src = "assets/frogger_spriteSheet.png";
+		spriteSheet.src = "assets/frogger_sprites.png";
 		spriteSheet.onload = function() {
 			sprite_width = spriteSheet.width;	//
 			
 			//Globals
 			level = 1;
-			lives = 5;
+			lives = 3;
 			score = 0;
 			highscore = 0;	//for now
 			
@@ -72,7 +94,10 @@ function drawBackground() {
 	//Level elements
 	drawWater(0, 274);
 	drawRoadBG(274, 530);
-	drawLily(57);
+	//drawLily(57);
+	var lily = new LilyMat();
+	lily.y = 57 + lily.sprite.height/2;
+	lily.draw();
 	
 	drawOverlays(); //Header and footer
 }
