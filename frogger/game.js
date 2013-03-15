@@ -90,7 +90,7 @@ function Car() {
 	this.sprites = {
 		car : new SpriteSheetCoords(10, 267, 28, 20, LEFT),
 		racecar : new SpriteSheetCoords(47, 265, 27, 24, RIGHT),
-		yellow_racer : new SpriteSheetCoords(82, 264, 24, 26, RIGHT),
+		yellow_racer : new SpriteSheetCoords(82, 264, 24, 26, LEFT),
 		truck : new SpriteSheetCoords(106, 302, 46, 18, LEFT)
 	};
 	this.start_x = null;
@@ -139,7 +139,7 @@ function start_game() {
 			highscore = 0;	//for now
 			
 			gameBB = new BoundingBox(0, 0, canvas.width, canvas.height);
-			objects = initLevelObjects();
+			initLevelObjects();
 			var frogger = new Frogger();
 			frogger.sprite = frogger.sprites.sitting;
 			frogger.x = 199; frogger.y = 515;
@@ -157,22 +157,15 @@ function start_game() {
 	}
 }
 
+//Creates arrays of all objects, obstacles, cars, and logs
 function initLevelObjects() {
-	var objects = [];
-	var obstacles = [];
-	var cars = initCars();
+	objects = [];
+	obstacles = [];
+	cars = initCars();
+	logs = initLogs();
 	
-	var log = new Log();
-	log.sprite = log.sprites.med;
-	log.x = canvas.width+150; log.y = 200;
-	log.start_x = canvas.width+150;
-	log.v_x = -2;
-	objects.push(log);
-	obstacles.push(log);
-	
-	objects = objects.concat(cars);
-	obstacles = obstacles.concat(cars);
-	return objects;
+	objects = objects.concat(cars).concat(logs);
+	obstacles = obstacles.concat(cars).concat(logs);
 }
 
 function initCars() {
@@ -181,39 +174,121 @@ function initCars() {
 	for (var i = 0; i < 4; i++) {		//1st row: trucks
 		var truck = new Car();
 		truck.sprite = truck.sprites.truck;
-		truck.x = 250 - 120*i; truck.y = 330;
+		truck.x = 250 - 120*i; truck.y = 325;
 		truck.start_x = -30;
 		truck.direction = RIGHT;
 		truck.v_x = 1.5;
 		cars.push(truck);
 	}
 	
-	for (var i = 0; i < 3; i++) {		//2st row: white racers
+	for (var i = 0; i < 3; i++) {		//2nd row: white racers
 		var car_obst = new Car();
 		car_obst.sprite = car_obst.sprites.racecar;
-		car_obst.x = 20 + 180*i; car_obst.y = 360;
+		car_obst.x = 20 + 180*i; car_obst.y = 355;
 		car_obst.start_x = canvas.width + 30;
 		car_obst.direction = LEFT;
 		car_obst.v_x = -4;
 		cars.push(car_obst);
 	}
 	
-	for (var i = 0; i < 4; i++) {
+	for (var i = 0; i < 4; i++) {		//3rd row: purple cars
 		var car = new Car();
 		car.sprite = car.sprites.car;
-		car.x = 300 - 100*i, car.y = 400;
+		car.x = 300 - 100*i, car.y = 385;
 		car.start_x = -20;
 		car.direction = RIGHT;
 		car.v_x = 3;
 		cars.push(car);
 	}
+	
+	for (var i = 0; i < 3; i++) {		//4th row: white racers
+		var car_obst = new Car();
+		car_obst.sprite = car_obst.sprites.yellow_racer;
+		car_obst.x = 30 + 180*i; car_obst.y = 415;
+		car_obst.start_x = canvas.width + 30;
+		car_obst.direction = LEFT;
+		car_obst.v_x = -3.5;
+		cars.push(car_obst);
+	}
+	
+	for (var i = 0; i < 3; i++) {		//5th row: trucks
+		var car_obst = new Car();
+		car_obst.sprite = car_obst.sprites.truck;
+		car_obst.x = 50 + (canvas.width/3)*i; car_obst.y = 445;
+		car_obst.start_x = canvas.width + 50;
+		car_obst.direction = LEFT;
+		car_obst.v_x = -1.5;
+		cars.push(car_obst);
+	}
+	
+	for (var i = 0; i < 4; i++) {		//6th row: white racers
+		var car_obst = new Car();
+		car_obst.sprite = car_obst.sprites.racecar;
+		car_obst.x = canvas.width/2 - (canvas.width/3)*i; car_obst.y = 475;
+		car_obst.start_x = -40;
+		car_obst.direction = RIGHT;
+		car_obst.v_x = 2.5;
+		cars.push(car_obst);
+	}
+	
 	return cars;
 }
 
+function initLogs() {
+	var logs = [];
+	
+	for (var i = 0; i < 3; i++) {		//1st row: med
+		var log = new Log();
+		log.sprite = log.sprites.med;
+		log.x = 50 + (log.sprite.width+10)*i; log.y = 135;
+		log.start_x = -60;
+		log.v_x = 2;
+		logs.push(log);
+	}
+	
+	for (var i = 0; i < 3; i++) {		//2nd row: short
+		var log = new Log();
+		log.sprite = log.sprites.short;
+		log.x = 50 + (canvas.width/3)*i; log.y = 165;
+		log.start_x = -60;
+		log.v_x = 4;
+		logs.push(log);
+	}
+	
+	for (var i = 0; i < 2; i++) {		//3rd row: long
+		var log = new Log();
+		log.sprite = log.sprites.long;
+		log.x = 300*i; log.y = 195;
+		log.start_x = -100;
+		log.v_x = 2.5;
+		logs.push(log);
+	}
+	
+	for (var i = 0; i < 4; i++) {		//4th row: med
+		var log = new Log();
+		log.sprite = log.sprites.med;
+		log.x = 0 + (log.sprite.width+15)*i; log.y = 225;
+		log.start_x = -120;
+		log.v_x = 3.5;
+		logs.push(log);
+	}
+	
+	for (var i = 0; i < 2; i++) {		//5th row: short
+		var log = new Log();
+		log.sprite = log.sprites.short;
+		log.x = 50 + (canvas.width/3)*i; log.y = 255;
+		log.start_x = -60;
+		log.v_x = 1;
+		logs.push(log);
+	}
+	
+	return logs;
+}
 /////////////// GAME LOOP ///
 function update() {
 	for (var i = 0; i < objects.length; i++) {
 		objects[i].update();
+		//check collisions
 		for (var j = 0; j < objects.length; j++) {
 			if (j != i && objects[i].boundingBox().checkCollision( objects[j].boundingBox() )) {
 				objects[i].v_x = 0;
@@ -246,7 +321,7 @@ function drawBackground() {
 	//Level elements
 	drawWater(0, 274);
 	drawRoadBG(274, 530);
-	drawLily(57);
+	drawLily(67);
 	
 	drawOverlays(); //Header and footer
 }
