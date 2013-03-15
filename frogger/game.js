@@ -80,8 +80,11 @@ function Log() {
 		med : new SpriteSheetCoords(7, 198, 116, 21),
 		long : new SpriteSheetCoords(7, 166, 177, 21),
 	};
+	this.start_x = null;
+	this.entered_game = false;
 }
 Log.prototype = Object.create(GameObj.prototype);
+Log.prototype.update = wrapToStart;
 function Car() {
 	GameObj.call(this);
 	this.sprites = {
@@ -90,8 +93,11 @@ function Car() {
 		yellow_racer : new SpriteSheetCoords(82, 264, 24, 26, RIGHT),
 		truck : new SpriteSheetCoords(106, 302, 46, 18, LEFT)
 	};
+	this.start_x = null;
+	this.entered_game = false;
 }
 Car.prototype = Object.create(GameObj.prototype);
+Car.prototype.update = wrapToStart;
 function Frogger() {
 	GameObj.call(this);
 	this.sprites = {
@@ -100,6 +106,19 @@ function Frogger() {
 	};
 }
 Frogger.prototype = Object.create(GameObj.prototype);
+
+//Call this in an objet's update() to return to starting point
+//after it goes offscreen (to create constantly looping objects)
+//Expects start_x and entered_game to be set
+function wrapToStart() {
+	if (!inGame(this.boundingBox())) {	
+		if (this.entered_game) {
+			this.x = this.start_x;
+			this.entered_game = false;
+		}
+	} else
+		this.entered_game = true;
+}
 
 /////////////// GAME INITIALIZATION ///
 var canvas;
@@ -119,6 +138,7 @@ function start_game() {
 			score = 0;
 			highscore = 0;	//for now
 			
+			gameBB = new BoundingBox(0, 0, canvas.width, canvas.height);
 			objects = initLevelObjects();
 			var frogger = new Frogger();
 			frogger.sprite = frogger.sprites.sitting;
@@ -139,26 +159,33 @@ function start_game() {
 
 function initLevelObjects() {
 	var objects = [];
+	var obstacles = [];
 	
 	var car = new Car();
 	car.sprite = car.sprites.car;
-	car.x = 40, car.y = 400;
+	car.x = -20, car.y = 400;
+	car.start_x = -20;
 	car.direction = RIGHT;
-	car.v_x = 3;
+	car.v_x = 5;
 	objects.push(car);
+	obstacles.push(car);
 	
 	var truck = new Car();
 	truck.sprite = truck.sprites.truck;
-	truck.x = 250; truck.y = 400;
+	truck.x = 250; truck.y = 300;
+	truck.start_x = canvas.width + 30;
 	truck.direction = LEFT;
-	truck.v_x = -2;
+	truck.v_x = -4;
 	objects.push(truck);
+	obstacles.push(truck);
 	
 	var log = new Log();
 	log.sprite = log.sprites.med;
-	log.x = 100; log.y = 200;
+	log.x = canvas.width+150; log.y = 200;
+	log.start_x = canvas.width+150;
 	log.v_x = -2;
 	objects.push(log);
+	obstacles.push(log);
 	
 	return objects;
 }
@@ -166,6 +193,7 @@ function initLevelObjects() {
 /////////////// GAME LOOP ///
 function update() {
 	for (var i = 0; i < objects.length; i++) {
+		objects[i].update();
 		for (var j = 0; j < objects.length; j++) {
 			if (j != i && objects[i].boundingBox().checkCollision( objects[j].boundingBox() )) {
 				objects[i].v_x = 0;
@@ -240,3 +268,5 @@ function drawOverlays() {
 
 /////////////// UTILITY FUNCTIONS ///
 function rand(start, end) { return Math.floor(Math.random()*(end-start+1)) + start; }
+
+function inGame(boundingBox) { return boundingBox.checkCollision(gameBB); }
