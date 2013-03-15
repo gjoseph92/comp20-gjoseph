@@ -8,5 +8,7 @@ A homage to Frogger in HTML5's canvas.
 	3. The vehicles and logs move.
 	4. Frogger loses a life when he hits a vehicle, the water, or the peninsulas of the "home" lilypad
 	5. Basic scoring is implemented.
+  Additionally, I implemented:
+  - Game sounds
 - I worked on my own for this assignment.
 - I spent approximately 18 hours on this project.

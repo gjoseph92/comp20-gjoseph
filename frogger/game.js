@@ -430,9 +430,7 @@ function playJumpSound() {
 	var jump_sound1 = $('#jump_snd1')[0];
 	var jump_sound2 = $('#jump_snd2')[0];
 	if (jump_sound1.currentTime > 0 && jump_sound1.currentTime < jump_sound1.duration) {
-		console.log(jump_sound1.currentTime);
 		jump_sound2.play()
-		console.log('playing sound2');
 	}
 	else
 		jump_sound1.play();
