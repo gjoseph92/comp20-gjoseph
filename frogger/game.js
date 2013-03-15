@@ -385,7 +385,7 @@ function win() {
 }
 
 function keyDown(event) {
-	console.log(event.keyCode);
+	console.log(event.keyCode);	//!!!:
 	switch(event.keyCode) {
 		case 38: 	//up
 			frogger.y -= 35;
@@ -395,30 +395,47 @@ function keyDown(event) {
 				score += 10;
 			}
 			event.preventDefault();
+			playJumpSound();
 			break;
 		case 40:	//down
 			frogger.y += 35;
 			frogger.direction = DOWN;
 			event.preventDefault();
+			playJumpSound();
 			break;
 		case 37:	//left
 			frogger.x -= 21;
 			frogger.direction = LEFT;
 			event.preventDefault();
+			playJumpSound();
 			break;
 		case 39:	//right
 			frogger.x += 21;
 			frogger.direction = RIGHT;
 			event.preventDefault();
+			playJumpSound();
 			break;
 		case 66:	//'b'	-- show bounding boxes
 			drawBB = !drawBB;
 			break;
-		case 67:	//'c'	-- show bounding boxes
+		case 67:	//'c'	-- disable collisions
 			collisions = !collisions;
 			console.log(collisions);
 			break;
 	}
+}
+
+//Alternate playing the 2 copies of the jump sound to allowing overlapping sound effects
+function playJumpSound() {
+	var jump_sound1 = $('#jump_snd1')[0];
+	var jump_sound2 = $('#jump_snd2')[0];
+	if (jump_sound1.currentTime > 0 && jump_sound1.currentTime < jump_sound1.duration) {
+		console.log(jump_sound1.currentTime);
+		jump_sound2.play()
+		console.log('playing sound2');
+	}
+	else
+		jump_sound1.play();
 }
 
 /////////////// DRAW FUNCTIONS ///
