@@ -67,12 +67,14 @@ GameObj.prototype.boundingBox = function() {	//KNOWN ERROR: bounding boxes do no
 }
 
 /////////////// SPECIFIC TYPES AND CLASSES ///
-function LilyMat() {											//TODO: lily object probably won't be used
+function FinishLily() {
 	GameObj.call(this);
-	this.sprite = new SpriteSheetCoords(0, 55, 399, 53);
-	this.x = canvas.width/2;
+	this.sprite = new SpriteSheetCoords(0, 0, 25, 25);	//coords just used to set dimensions, never drawn
 }
-LilyMat.prototype = Object.create(GameObj.prototype);
+FinishLily.prototype = Object.create(GameObj.prototype);
+FinishLily.prototype.draw = function() { ctx.save(); ctx.fillStyle = 'green'; ctx.strokeStyle = 'yellow'; ctx.translate(this.x, this.y);
+										 ctx.fillRect(-this.sprite.width/2, -this.sprite.height/2, this.sprite.width, this.sprite.height);
+										 ctx.restore(); }
 function Log() {
 	GameObj.call(this);
 	this.sprites = {
@@ -142,6 +144,8 @@ function start_game() {
 			lives = 3;
 			score = 0;
 			highscore = 0;	//for now
+			drawBB = false; //for debugging
+			collisions = true; //for debugging
 			
 			gameBB = new BoundingBox(0, 0, canvas.width, canvas.height);
 			initLevelObjects();
@@ -164,7 +168,7 @@ function start_game() {
 	}
 }
 
-//Creates arrays of all objects, obstacles, cars, and logs
+//Creates arrays of all objects, obstacles, platforms, finish_pads, cars, and logs
 function initLevelObjects() {
 	cars = initCars();
 	logs = initLogs();
@@ -172,7 +176,24 @@ function initLevelObjects() {
 	objects = cars.concat(logs);
 	obstacles = cars;
 	platforms = logs;
-	
+
+	waterArea = new BoundingBox(0, 105, canvas.width, 282);
+	for (var i = 0; i < 6; i++)	{	//make peninsulas on lilypad into obstacles
+		var obj = new GameObj();
+		obj.sprite = new SpriteSheetCoords(0, 0, 47, 47);	//coords just used to set dimensions, never drawn
+		obj.x = -17 + i*85;
+		obj.y = 80;
+		obstacles.push(obj);
+	}
+	finish_pads = [];
+	for (var i = 0; i < 5; i++) {
+		var lily = new FinishLily();
+		lily.x = 27 + i*85; lily.y = 88;
+		finish_pads.push(lily);
+		objects.push(lily);
+	}
+
+
 }
 
 function initCars() {
@@ -188,23 +209,23 @@ function initCars() {
 		cars.push(car_obst);
 	}
 	
-	for (var i = 0; i < 4; i++) {		//2nd row: purple cars
+	for (var i = 0; i < 3; i++) {		//2nd row: purple cars
 		var car = new Car();
 		car.sprite = car.sprites.car;
 		car.x = 300 - 120*i, car.y = 370;
 		car.start_x = -20;
 		car.direction = RIGHT;
-		car.v_x = 1.5;
+		car.v_x = 1;
 		cars.push(car);
 	}
 	
-	for (var i = 0; i < 3; i++) {		//3rd row: white racers
+	for (var i = 0; i < 3; i++) {		//3rd row: yellow racers
 		var car_obst = new Car();
 		car_obst.sprite = car_obst.sprites.yellow_racer;
-		car_obst.x = 30 + 180*i; car_obst.y = 405;
+		car_obst.x = 30 + 50*i; car_obst.y = 405;
 		car_obst.start_x = canvas.width + 30;
 		car_obst.direction = LEFT;
-		car_obst.v_x = -3.5;
+		car_obst.v_x = -2.5;
 		cars.push(car_obst);
 	}
 	
@@ -214,7 +235,7 @@ function initCars() {
 		car_obst.x = 50 + (canvas.width/3)*i; car_obst.y = 440;
 		car_obst.start_x = canvas.width + 50;
 		car_obst.direction = LEFT;
-		car_obst.v_x = -1.5;
+		car_obst.v_x = -1;
 		cars.push(car_obst);
 	}
 	
@@ -281,12 +302,14 @@ function initLogs() {
 	
 	return logs;
 }
+
 /////////////// GAME LOOP ///
 function update() {
 	for (var i = 0; i < objects.length; i++)
 		objects[i].update();
 	
-	froggerBB = frogger.boundingBox();
+	var froggerBB = frogger.boundingBox();
+	if (!inGame(froggerBB)) die();
 	//Sit frogger on platforms
 	var on_platform = false;
 	for (var j = 0; j < platforms.length; j++) {
@@ -300,14 +323,25 @@ function update() {
 	if (!on_platform) {
 		frogger.v_x = 0;
 		frogger.v_y = 0;
+		if (collisions && froggerBB.checkCollision(waterArea))
+			die();
 	}
 	
 	//Check collisions
-	for (var j = 0; j < obstacles.length; j++) {
-		if (obstacles[j].boundingBox().checkCollision( froggerBB )) {
-			obstacles[j].v_x = 0;
-			obstacles[j].v_y = 0;
+	if (collisions) {
+		for (var j = 0; j < obstacles.length; j++) {
+			if (obstacles[j].boundingBox().checkCollision( froggerBB )) {
+				obstacles[j].v_x = 0;
+				obstacles[j].v_y = 0;
+				die();
+			}
 		}
+	}
+	
+	//Check for win
+	for (var i = 0; i < finish_pads.length; i++) {
+		if (finish_pads[i].boundingBox().checkCollision( froggerBB ))
+			win();
 	}
 }
 
@@ -315,13 +349,34 @@ function draw() {
 	drawBackground();
 	for (var i = 0; i < objects.length; i++) {
 		objects[i].draw();
-		//objects[i].boundingBox().draw();
+		if (drawBB) objects[i].boundingBox().draw();
+	}
+	
+	if (drawBB) {
+		for (var i = 0; i < finish_pads.length; i++)
+			finish_pads[i].boundingBox().draw();
+		for (var i = 0; i < obstacles.length; i++)
+			obstacles[i].boundingBox().draw();
+		waterArea.draw();
 	}
 }
 
 function gameLoop() {
 	update();
 	draw();
+}
+
+function die() {
+	frogger.sprite = frogger.sprites.sitting;
+	frogger.x = 197; frogger.y = 510;
+	frogger.direction = UP;
+	lives--;
+}
+function win() {
+	frogger.sprite = frogger.sprites.sitting;
+	frogger.x = 197; frogger.y = 510;
+	frogger.direction = UP;
+	level++;
 }
 
 function keyDown(event) {
@@ -338,14 +393,21 @@ function keyDown(event) {
 			event.preventDefault();
 			break;
 		case 37:	//left
-			frogger.x -= 42;
+			frogger.x -= 21;
 			frogger.direction = LEFT;
 			event.preventDefault();
 			break;
 		case 39:	//right
-			frogger.x += 42;
+			frogger.x += 21;
 			frogger.direction = RIGHT;
 			event.preventDefault();
+			break;
+		case 66:	//'b'	-- show bounding boxes
+			drawBB = !drawBB;
+			break;
+		case 67:	//'c'	-- show bounding boxes
+			collisions = !collisions;
+			console.log(collisions);
 			break;
 	}
 }
