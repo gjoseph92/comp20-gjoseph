@@ -106,6 +106,11 @@ function Frogger() {
 	};
 }
 Frogger.prototype = Object.create(GameObj.prototype);
+function Fly() {
+	GameObj.call(this);
+	this.sprite = new SpriteSheetCoords(144, 232, 25, 24, RIGHT);
+}
+Fly.prototype = Object.create(GameObj.prototype);
 
 //Call this in an objet's update() to return to starting point
 //after it goes offscreen (to create constantly looping objects)
@@ -161,13 +166,13 @@ function start_game() {
 
 //Creates arrays of all objects, obstacles, cars, and logs
 function initLevelObjects() {
-	objects = [];
-	obstacles = [];
 	cars = initCars();
 	logs = initLogs();
 	
-	objects = objects.concat(cars).concat(logs);
-	obstacles = obstacles.concat(cars).concat(logs);
+	objects = cars.concat(logs);
+	obstacles = cars;
+	platforms = logs;
+	
 }
 
 function initCars() {
@@ -265,11 +270,11 @@ function initLogs() {
 		logs.push(log);
 	}
 	
-	for (var i = 0; i < 2; i++) {		//5th row: short
+	for (var i = 0; i < 3; i++) {		//5th row: short
 		var log = new Log();
 		log.sprite = log.sprites.short;
-		log.x = 50 + (canvas.width/3)*i; log.y = 264;
-		log.start_x = -60;
+		log.x = -50 + (canvas.width/2)*i; log.y = 264;
+		log.start_x = -100;
 		log.v_x = 1;
 		logs.push(log);
 	}
@@ -278,16 +283,30 @@ function initLogs() {
 }
 /////////////// GAME LOOP ///
 function update() {
-	for (var i = 0; i < objects.length; i++) {
+	for (var i = 0; i < objects.length; i++)
 		objects[i].update();
-		//check collisions
-		for (var j = 0; j < objects.length; j++) {
-			if (j != i && objects[i].boundingBox().checkCollision( objects[j].boundingBox() )) {
-				objects[i].v_x = 0;
-				objects[i].v_y = 0;
-				objects[j].v_x = 0;
-				objects[j].v_y = 0;
-			}
+	
+	froggerBB = frogger.boundingBox();
+	//Sit frogger on platforms
+	var on_platform = false;
+	for (var j = 0; j < platforms.length; j++) {
+		if (platforms[j].boundingBox().checkCollision( froggerBB )) {
+			frogger.v_x = platforms[j].v_x;
+			frogger.v_y = platforms[j].v_y;
+			on_platform = true;
+		}
+	}
+	
+	if (!on_platform) {
+		frogger.v_x = 0;
+		frogger.v_y = 0;
+	}
+	
+	//Check collisions
+	for (var j = 0; j < obstacles.length; j++) {
+		if (obstacles[j].boundingBox().checkCollision( froggerBB )) {
+			obstacles[j].v_x = 0;
+			obstacles[j].v_y = 0;
 		}
 	}
 }
