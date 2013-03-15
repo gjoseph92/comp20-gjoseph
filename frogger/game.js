@@ -29,12 +29,16 @@ function SpriteSheetCoords(x, y, width, height, angle) {
 function GameObj() {
 	this.x = 0;
 	this.y = 0;
+	this.v_x = 0;
+	this.v_y = 0;
 	this.direction = RIGHT;
 	this.sprite = null;
 	this.sprites = {};
 }
 GameObj.prototype.update = function() {}
 GameObj.prototype.draw = function() {
+	this.x += this.v_x;
+	this.y += this.v_y;
 	ctx.save();
 	ctx.translate(this.x, this.y);
 	ctx.rotate(this.direction - this.sprite.angle);
@@ -115,16 +119,6 @@ function start_game() {
 	}
 }
 
-/////////////// GAME LOOP ///
-function draw() {
-	drawBackground();
-	for (var i = 0; i < objects.length; i++) {
-		objects[i].x = objects[i].x + 4;
-		objects[i].draw();
-	}
-}
-
-/////////////// DRAW FUNCTIONS ///
 function initLevelObjects() {
 	var objects = [];
 	
@@ -132,22 +126,34 @@ function initLevelObjects() {
 	car.sprite = car.sprites.car;
 	car.x = 40, car.y = 400;
 	car.direction = RIGHT;
+	car.v_x = 3;
 	objects.push(car);
 	
 	var truck = new Car();
 	truck.sprite = truck.sprites.truck;
 	truck.x = 250; truck.y = 450;
 	truck.direction = UP;
+	truck.v_y = -4;
 	objects.push(truck);
 	
 	var log = new Log();
 	log.sprite = log.sprites.med;
 	log.x = 100; log.y = 200;
+	log.v_x = -2;
 	objects.push(log);
 	
 	return objects;
 }
 
+/////////////// GAME LOOP ///
+function draw() {
+	drawBackground();
+	for (var i = 0; i < objects.length; i++) {
+		objects[i].draw();
+	}
+}
+
+/////////////// DRAW FUNCTIONS ///
 function drawBackground() {
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
