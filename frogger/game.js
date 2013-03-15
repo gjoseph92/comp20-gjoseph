@@ -140,11 +140,13 @@ function start_game() {
 			
 			gameBB = new BoundingBox(0, 0, canvas.width, canvas.height);
 			initLevelObjects();
-			var frogger = new Frogger();
+			frogger = new Frogger();
 			frogger.sprite = frogger.sprites.sitting;
-			frogger.x = 199; frogger.y = 515;
+			frogger.x = 197; frogger.y = 510;
 			frogger.direction = UP;
 			objects.push(frogger);
+			
+			$('body').keydown(keyDown);
 			
 			var intervalID = setInterval(gameLoop, 35);
 		}
@@ -171,57 +173,47 @@ function initLevelObjects() {
 function initCars() {
 	var cars = [];
 	
-	for (var i = 0; i < 4; i++) {		//1st row: trucks
-		var truck = new Car();
-		truck.sprite = truck.sprites.truck;
-		truck.x = 250 - 120*i; truck.y = 325;
-		truck.start_x = -30;
-		truck.direction = RIGHT;
-		truck.v_x = 1.5;
-		cars.push(truck);
-	}
-	
-	for (var i = 0; i < 3; i++) {		//2nd row: white racers
+	for (var i = 0; i < 3; i++) {		//1st row: white racers
 		var car_obst = new Car();
 		car_obst.sprite = car_obst.sprites.racecar;
-		car_obst.x = 20 + 180*i; car_obst.y = 355;
+		car_obst.x = 20 + 180*i; car_obst.y = 335;
 		car_obst.start_x = canvas.width + 30;
 		car_obst.direction = LEFT;
 		car_obst.v_x = -4;
 		cars.push(car_obst);
 	}
 	
-	for (var i = 0; i < 4; i++) {		//3rd row: purple cars
+	for (var i = 0; i < 4; i++) {		//2nd row: purple cars
 		var car = new Car();
 		car.sprite = car.sprites.car;
-		car.x = 300 - 100*i, car.y = 385;
+		car.x = 300 - 120*i, car.y = 370;
 		car.start_x = -20;
 		car.direction = RIGHT;
-		car.v_x = 3;
+		car.v_x = 1.5;
 		cars.push(car);
 	}
 	
-	for (var i = 0; i < 3; i++) {		//4th row: white racers
+	for (var i = 0; i < 3; i++) {		//3rd row: white racers
 		var car_obst = new Car();
 		car_obst.sprite = car_obst.sprites.yellow_racer;
-		car_obst.x = 30 + 180*i; car_obst.y = 415;
+		car_obst.x = 30 + 180*i; car_obst.y = 405;
 		car_obst.start_x = canvas.width + 30;
 		car_obst.direction = LEFT;
 		car_obst.v_x = -3.5;
 		cars.push(car_obst);
 	}
 	
-	for (var i = 0; i < 3; i++) {		//5th row: trucks
+	for (var i = 0; i < 3; i++) {		//4th row: trucks
 		var car_obst = new Car();
 		car_obst.sprite = car_obst.sprites.truck;
-		car_obst.x = 50 + (canvas.width/3)*i; car_obst.y = 445;
+		car_obst.x = 50 + (canvas.width/3)*i; car_obst.y = 440;
 		car_obst.start_x = canvas.width + 50;
 		car_obst.direction = LEFT;
 		car_obst.v_x = -1.5;
 		cars.push(car_obst);
 	}
 	
-	for (var i = 0; i < 4; i++) {		//6th row: white racers
+	for (var i = 0; i < 4; i++) {		//5th row: white racers
 		var car_obst = new Car();
 		car_obst.sprite = car_obst.sprites.racecar;
 		car_obst.x = canvas.width/2 - (canvas.width/3)*i; car_obst.y = 475;
@@ -240,7 +232,7 @@ function initLogs() {
 	for (var i = 0; i < 3; i++) {		//1st row: med
 		var log = new Log();
 		log.sprite = log.sprites.med;
-		log.x = 50 + (log.sprite.width+10)*i; log.y = 135;
+		log.x = 50 + (log.sprite.width+10)*i; log.y = 124;
 		log.start_x = -60;
 		log.v_x = 2;
 		logs.push(log);
@@ -249,7 +241,7 @@ function initLogs() {
 	for (var i = 0; i < 3; i++) {		//2nd row: short
 		var log = new Log();
 		log.sprite = log.sprites.short;
-		log.x = 50 + (canvas.width/3)*i; log.y = 165;
+		log.x = 50 + (canvas.width/3)*i; log.y = 159;
 		log.start_x = -60;
 		log.v_x = 4;
 		logs.push(log);
@@ -258,7 +250,7 @@ function initLogs() {
 	for (var i = 0; i < 2; i++) {		//3rd row: long
 		var log = new Log();
 		log.sprite = log.sprites.long;
-		log.x = 300*i; log.y = 195;
+		log.x = 300*i; log.y = 194;
 		log.start_x = -100;
 		log.v_x = 2.5;
 		logs.push(log);
@@ -267,7 +259,7 @@ function initLogs() {
 	for (var i = 0; i < 4; i++) {		//4th row: med
 		var log = new Log();
 		log.sprite = log.sprites.med;
-		log.x = 0 + (log.sprite.width+15)*i; log.y = 225;
+		log.x = 0 + (log.sprite.width+15)*i; log.y = 229;
 		log.start_x = -120;
 		log.v_x = 3.5;
 		logs.push(log);
@@ -276,7 +268,7 @@ function initLogs() {
 	for (var i = 0; i < 2; i++) {		//5th row: short
 		var log = new Log();
 		log.sprite = log.sprites.short;
-		log.x = 50 + (canvas.width/3)*i; log.y = 255;
+		log.x = 50 + (canvas.width/3)*i; log.y = 264;
 		log.start_x = -60;
 		log.v_x = 1;
 		logs.push(log);
@@ -313,15 +305,41 @@ function gameLoop() {
 	draw();
 }
 
+function keyDown(event) {
+	console.log(event.keyCode);
+	switch(event.keyCode) {
+		case 38: 	//up
+			frogger.y -= 35;
+			frogger.direction = UP;
+			event.preventDefault();
+			break;
+		case 40:	//down
+			frogger.y += 35;
+			frogger.direction = DOWN;
+			event.preventDefault();
+			break;
+		case 37:	//left
+			frogger.x -= 42;
+			frogger.direction = LEFT;
+			event.preventDefault();
+			break;
+		case 39:	//right
+			frogger.x += 42;
+			frogger.direction = RIGHT;
+			event.preventDefault();
+			break;
+	}
+}
+
 /////////////// DRAW FUNCTIONS ///
 function drawBackground() {
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	
 	//Level elements
-	drawWater(0, 274);
-	drawRoadBG(274, 530);
-	drawLily(67);
+	drawWater(0, 282);
+	drawRoadBG(282, 530);
+	drawLily(53);
 	
 	drawOverlays(); //Header and footer
 }
