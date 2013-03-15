@@ -10,13 +10,25 @@ var LEFT = Math.PI;
 var RIGHT = 0;
 
 /////////////// ABSTRACT TYPES AND CLASSES ///
-function BoundingBox(ul, ur, ll, lr) {
-	this.ul = ul;
-	this.ur = ur;
-	this.ll = ll;
-	this.lr = lr;
+function BoundingBox(ul_x, ul_y, lr_x, lr_y) {
+	this.ul_x = ul_x;
+	this.ul_y = ul_y;
+	this.lr_x = lr_x;
+	this.lr_y = lr_y;
 }
-BoundingBox.prototype.checkCollision = function(otherBoundingBox) {}
+BoundingBox.prototype.checkCollision = function(otherBoundingBox) {
+	if (this.lr_x < otherBoundingBox.ul_x) return false;
+	if (this.ul_x > otherBoundingBox.lr_x) return false;
+	if (this.lr_y < otherBoundingBox.ul_y) return false;
+	if (this.ul_y > otherBoundingBox.lr_y) return false;
+	return true;
+}
+BoundingBox.prototype.draw = function() {	//for debugging collisions
+	ctx.save();
+	ctx.strokeStyle = 'orange';
+	ctx.strokeRect(this.ul_x, this.ul_y, this.lr_x - this.ul_x, this.lr_y - this.ul_y);
+	ctx.restore();
+}
 
 function SpriteSheetCoords(x, y, width, height, angle) {
 	this.x = x;
@@ -46,7 +58,13 @@ GameObj.prototype.draw = function() {
 				  -this.sprite.width/2, -this.sprite.height/2, this.sprite.width, this.sprite.height);
 	ctx.restore();
 }
-GameObj.prototype.boundingBox = function() {}
+GameObj.prototype.boundingBox = function() {	//KNOWN ERROR: bounding boxes do not account for object direction!
+	var half_w = this.sprite.width / 2;
+	var half_h = this.sprite.height / 2;
+	var x = this.x;
+	var y = this.y;
+	return new BoundingBox(x - half_w, y - half_h, x + half_w, y + half_h);
+}
 
 /////////////// SPECIFIC TYPES AND CLASSES ///
 function LilyMat() {											//TODO: lily object probably won't be used
@@ -108,7 +126,7 @@ function start_game() {
 			frogger.direction = UP;
 			objects.push(frogger);
 			
-			var intervalID = setInterval(draw, 35);
+			var intervalID = setInterval(gameLoop, 35);
 		}
 	}
 	else {
@@ -131,9 +149,9 @@ function initLevelObjects() {
 	
 	var truck = new Car();
 	truck.sprite = truck.sprites.truck;
-	truck.x = 250; truck.y = 450;
-	truck.direction = UP;
-	truck.v_y = -4;
+	truck.x = 250; truck.y = 400;
+	truck.direction = LEFT;
+	truck.v_x = -2;
 	objects.push(truck);
 	
 	var log = new Log();
@@ -146,11 +164,30 @@ function initLevelObjects() {
 }
 
 /////////////// GAME LOOP ///
+function update() {
+	for (var i = 0; i < objects.length; i++) {
+		for (var j = 0; j < objects.length; j++) {
+			if (j != i && objects[i].boundingBox().checkCollision( objects[j].boundingBox() )) {
+				objects[i].v_x = 0;
+				objects[i].v_y = 0;
+				objects[j].v_x = 0;
+				objects[j].v_y = 0;
+			}
+		}
+	}
+}
+
 function draw() {
 	drawBackground();
 	for (var i = 0; i < objects.length; i++) {
 		objects[i].draw();
+		objects[i].boundingBox().draw();
 	}
+}
+
+function gameLoop() {
+	update();
+	draw();
 }
 
 /////////////// DRAW FUNCTIONS ///
