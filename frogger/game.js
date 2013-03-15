@@ -160,24 +160,7 @@ function start_game() {
 function initLevelObjects() {
 	var objects = [];
 	var obstacles = [];
-	
-	var car = new Car();
-	car.sprite = car.sprites.car;
-	car.x = -20, car.y = 400;
-	car.start_x = -20;
-	car.direction = RIGHT;
-	car.v_x = 5;
-	objects.push(car);
-	obstacles.push(car);
-	
-	var truck = new Car();
-	truck.sprite = truck.sprites.truck;
-	truck.x = 250; truck.y = 300;
-	truck.start_x = canvas.width + 30;
-	truck.direction = LEFT;
-	truck.v_x = -4;
-	objects.push(truck);
-	obstacles.push(truck);
+	var cars = initCars();
 	
 	var log = new Log();
 	log.sprite = log.sprites.med;
@@ -187,7 +170,44 @@ function initLevelObjects() {
 	objects.push(log);
 	obstacles.push(log);
 	
+	objects = objects.concat(cars);
+	obstacles = obstacles.concat(cars);
 	return objects;
+}
+
+function initCars() {
+	var cars = [];
+	
+	for (var i = 0; i < 4; i++) {		//1st row: trucks
+		var truck = new Car();
+		truck.sprite = truck.sprites.truck;
+		truck.x = 250 - 120*i; truck.y = 330;
+		truck.start_x = -30;
+		truck.direction = RIGHT;
+		truck.v_x = 1.5;
+		cars.push(truck);
+	}
+	
+	for (var i = 0; i < 3; i++) {		//2st row: white racers
+		var car_obst = new Car();
+		car_obst.sprite = car_obst.sprites.racecar;
+		car_obst.x = 20 + 180*i; car_obst.y = 360;
+		car_obst.start_x = canvas.width + 30;
+		car_obst.direction = LEFT;
+		car_obst.v_x = -4;
+		cars.push(car_obst);
+	}
+	
+	for (var i = 0; i < 4; i++) {
+		var car = new Car();
+		car.sprite = car.sprites.car;
+		car.x = 300 - 100*i, car.y = 400;
+		car.start_x = -20;
+		car.direction = RIGHT;
+		car.v_x = 3;
+		cars.push(car);
+	}
+	return cars;
 }
 
 /////////////// GAME LOOP ///
@@ -209,7 +229,7 @@ function draw() {
 	drawBackground();
 	for (var i = 0; i < objects.length; i++) {
 		objects[i].draw();
-		objects[i].boundingBox().draw();
+		//objects[i].boundingBox().draw();
 	}
 }
 
