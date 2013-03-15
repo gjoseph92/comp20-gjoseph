@@ -74,6 +74,7 @@ function FinishLily() {
 FinishLily.prototype = Object.create(GameObj.prototype);
 FinishLily.prototype.draw = function() { ctx.save(); ctx.fillStyle = 'green'; ctx.strokeStyle = 'yellow'; ctx.translate(this.x, this.y);
 										 ctx.fillRect(-this.sprite.width/2, -this.sprite.height/2, this.sprite.width, this.sprite.height);
+										 ctx.strokeRect(-this.sprite.width/2, -this.sprite.height/2, this.sprite.width, this.sprite.height)
 										 ctx.restore(); }
 function Log() {
 	GameObj.call(this);
@@ -143,7 +144,9 @@ function start_game() {
 			level = 1;
 			lives = 3;
 			score = 0;
+			best_row = 510;
 			highscore = 0;	//for now
+			
 			drawBB = false; //for debugging
 			collisions = true; //for debugging
 			
@@ -376,7 +379,9 @@ function win() {
 	frogger.sprite = frogger.sprites.sitting;
 	frogger.x = 197; frogger.y = 510;
 	frogger.direction = UP;
+	score += 50;
 	level++;
+	if (((level-1) % 5) == 0) score += 1000;
 }
 
 function keyDown(event) {
@@ -385,6 +390,10 @@ function keyDown(event) {
 		case 38: 	//up
 			frogger.y -= 35;
 			frogger.direction = UP;
+			if (frogger.y < best_row) {
+				best_row = frogger.y;
+				score += 10;
+			}
 			event.preventDefault();
 			break;
 		case 40:	//down
