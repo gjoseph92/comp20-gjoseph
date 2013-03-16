@@ -1,6 +1,6 @@
 ## Frogger
 
-A homage to Frogger in HTML5's canvas.
+An homage to Frogger in HTML5's canvas.
 * * *
 - All required aspects have been implemented correctly:
 	1. The game loads completey without requiring a refresh.
@@ -11,5 +11,7 @@ A homage to Frogger in HTML5's canvas.
   Additionally, I implemented:
   - Game sounds
   - Animation of Frogger to dead frog icon
+  - (Exponetially) increasing difficulty with each level
+  - Option to repeat the game after losing
 - I worked on my own for this assignment.
 - I spent approximately 18 hours on this project.

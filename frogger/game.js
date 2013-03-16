@@ -8,6 +8,7 @@ var UP = -Math.PI/2;
 var DOWN = Math.PI/2;
 var LEFT = Math.PI;
 var RIGHT = 0;
+if (localStorage.froggerHighScore == null) localStorage.froggerHighScore = 0;
 
 /////////////// ABSTRACT TYPES AND CLASSES ///
 function BoundingBox(ul_x, ul_y, lr_x, lr_y) {
@@ -164,8 +165,8 @@ function start_game() {
 			
 			$('body').keydown(keyDown);
 			var music = $('#music_snd')[0];
-			if (typeof music.loop == 'boolean') music.loop = true;
-			else music.addEventListener('ended', function() { this.play(); }, false);		//TODO: loop callback!!
+			//if (typeof music.loop == 'boolean') music.loop = true;
+			//else music.addEventListener('ended', function() { this.play(); }, false);		//TODO: loop callback!!
 			music.play();
 			$('#get_started_snd')[0].play();
 			
@@ -359,9 +360,10 @@ function update() {
 	
 	//Check for win
 	for (var i = 0; i < finish_pads.length; i++) {
-		if (finish_pads[i].boundingBox().checkCollision( froggerBB ))
+		if (finish_pads[i].boundingBox().checkCollision( froggerBB )) {
 			win();
 			return;
+		}
 	}
 }
 
@@ -409,13 +411,31 @@ function die() {
 }
 
 function win() {
-	frogger.sprite = frogger.sprites.sitting;
-	frogger.x = 197; frogger.y = 510;
-	frogger.direction = UP;
+	lockControls = true;
 	score += 50;
 	level++;
 	if (((level-1) % 5) == 0) score += 1000;
 	$('#on_your_marks_snd')[0].play();
+	setTimeout(function() { frogger.sprite = frogger.sprites.jumping; }, 800);
+	setTimeout(function() { frogger.sprite = frogger.sprites.sitting; }, 1600);
+	setTimeout(function() { frogger.sprite = frogger.sprites.jumping; }, 2400);
+		setTimeout(function() {
+		frogger.sprite = frogger.sprites.sitting;
+		frogger.x = 197; frogger.y = 510;
+		frogger.direction = UP;
+		
+		for (var i = 0; i < cars.length; i++) {
+			if (cars[i].v_x > 0)
+				cars[i].v_x += 0.15*level;
+			else
+				cars[i].v_x -= 0.15*level;
+		}
+		for (var i = 0; i < logs.length; i++) {
+			logs[i].v_x += 0.1*level;
+		}
+		
+		lockControls = false;
+	}, 3200);
 }
 function drawGameOver() {
 	ctx.save();
@@ -520,7 +540,7 @@ function drawOverlays() {
 	ctx.font = "bold 24px Helvetica";
 	ctx.fillText('Level ' + level, 58, canvas.height - 15);
 	ctx.font = "bold 12px Helvetica";
-	ctx.fillText('Score: ' + score, 0, canvas.height - 2);
+	ctx.fillText('Score: ' + localStorage.froggerHighScore, 0, canvas.height - 2);
 	ctx.fillText('Highscore: ' + highscore, 78, canvas.height - 2);
 	for (var i = 0; i < lives; i++)		//draw lives as frogs
 		ctx.drawImage(spriteSheet, 13, 334, 17, 23, i * 19, canvas.height - 35, 17, 23);
@@ -528,7 +548,7 @@ function drawOverlays() {
 }
 
 /////////////// UTILITY FUNCTIONS ///
-function rand(start, end) { return Math.floor(Math.random()*(end-start+1)) + start; }
+function rand(start, end) { return Math.Math.floor(Math.random()*(end-start+1)) + start; }
 
 function inGame(boundingBox) { return boundingBox.checkCollision(gameBB); }
 
