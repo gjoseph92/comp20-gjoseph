@@ -10,5 +10,6 @@ A homage to Frogger in HTML5's canvas.
 	5. Basic scoring is implemented.
   Additionally, I implemented:
   - Game sounds
+  - Animation of Frogger to dead frog icon
 - I worked on my own for this assignment.
 - I spent approximately 18 hours on this project.

@@ -80,8 +80,8 @@ function Log() {
 	GameObj.call(this);
 	this.sprites = {
 		short : new SpriteSheetCoords(7, 230, 84, 21),
-		med : new SpriteSheetCoords(7, 198, 116, 21),
-		long : new SpriteSheetCoords(7, 166, 177, 21),
+		med   : new SpriteSheetCoords(7, 198, 116, 21),
+		long  : new SpriteSheetCoords(7, 166, 177, 21),
 	};
 	this.start_x = null;
 	this.entered_game = false;
@@ -91,10 +91,10 @@ Log.prototype.update = wrapToStart;
 function Car() {
 	GameObj.call(this);
 	this.sprites = {
-		car : new SpriteSheetCoords(10, 267, 28, 20, LEFT),
-		racecar : new SpriteSheetCoords(47, 265, 27, 24, RIGHT),
+		car			 : new SpriteSheetCoords(10, 267, 28, 20, LEFT),
+		racecar		 : new SpriteSheetCoords(47, 265, 27, 24, RIGHT),
 		yellow_racer : new SpriteSheetCoords(82, 264, 24, 26, LEFT),
-		truck : new SpriteSheetCoords(106, 302, 46, 18, LEFT)
+		truck		 : new SpriteSheetCoords(106, 302, 46, 18, LEFT)
 	};
 	this.start_x = null;
 	this.entered_game = false;
@@ -105,7 +105,8 @@ function Frogger() {
 	GameObj.call(this);
 	this.sprites = {
 		sitting : new SpriteSheetCoords(13, 334, 17, 23, RIGHT),
-		jumping : new SpriteSheetCoords(43, 335, 25, 22, RIGHT)
+		jumping : new SpriteSheetCoords(43, 335, 25, 22, RIGHT),
+		dead	: new SpriteSheetCoords(185, 192, 18, 24, UP)
 	};
 }
 Frogger.prototype = Object.create(GameObj.prototype);
@@ -132,7 +133,9 @@ function wrapToStart() {
 var canvas;
 var ctx; //the Canvas context
 var spriteSheet; //Image object of the sprite sheet
+var highscore = 0;
 function start_game() {
+	console.log('starting');
 	canvas = document.getElementById('game');
 	if (canvas.getContext) {
 		ctx = canvas.getContext('2d');
@@ -145,7 +148,8 @@ function start_game() {
 			lives = 3;
 			score = 0;
 			best_row = 510;
-			highscore = 0;	//for now
+			gameOver = false;
+			lockControls = false;
 			
 			drawBB = false; //for debugging
 			collisions = true; //for debugging
@@ -159,12 +163,13 @@ function start_game() {
 			objects.push(frogger);
 			
 			$('body').keydown(keyDown);
-			var music = $('#music_snd');
+			var music = $('#music_snd')[0];
 			if (typeof music.loop == 'boolean') music.loop = true;
-			else music.addEventListener('ended', function() { this.play(); }, false);
-			$('#get_started_snd').play();
+			else music.addEventListener('ended', function() { this.play(); }, false);		//TODO: loop callback!!
+			music.play();
+			$('#get_started_snd')[0].play();
 			
-			var intervalID = setInterval(gameLoop, 35);
+			intervalID = setInterval(gameLoop, 35);
 		}
 	}
 	else {
@@ -311,10 +316,16 @@ function initLogs() {
 }
 
 /////////////// GAME LOOP ///
+function gameLoop() {
+	update();
+	draw();
+}
+
 function update() {
 	for (var i = 0; i < objects.length; i++)
 		objects[i].update();
 	
+	if (gameOver || lockControls) return;
 	var froggerBB = frogger.boundingBox();
 	if (!inGame(froggerBB)) die();
 	//Sit frogger on platforms
@@ -330,17 +341,18 @@ function update() {
 	if (!on_platform) {
 		frogger.v_x = 0;
 		frogger.v_y = 0;
-		if (collisions && froggerBB.checkCollision(waterArea))
+		if (collisions && froggerBB.checkCollision(waterArea)) {
 			die();
+			return;
+		}
 	}
 	
 	//Check collisions
 	if (collisions) {
 		for (var j = 0; j < obstacles.length; j++) {
 			if (obstacles[j].boundingBox().checkCollision( froggerBB )) {
-				obstacles[j].v_x = 0;
-				obstacles[j].v_y = 0;
 				die();
+				return;
 			}
 		}
 	}
@@ -349,6 +361,7 @@ function update() {
 	for (var i = 0; i < finish_pads.length; i++) {
 		if (finish_pads[i].boundingBox().checkCollision( froggerBB ))
 			win();
+			return;
 	}
 }
 
@@ -366,20 +379,35 @@ function draw() {
 			obstacles[i].boundingBox().draw();
 		waterArea.draw();
 	}
-}
-
-function gameLoop() {
-	update();
-	draw();
+	if (gameOver) drawGameOver();
 }
 
 function die() {
-	frogger.sprite = frogger.sprites.sitting;
-	frogger.x = 197; frogger.y = 510;
+	console.log('died');
 	frogger.direction = UP;
+	frogger.sprite = frogger.sprites.dead;
 	lives--;
-	$('#death_snd').play();
+	$('#death_snd')[0].play();
+	lockControls = true;
+	setTimeout(function() {
+		frogger.sprite = frogger.sprites.sitting;
+		frogger.x = 197; frogger.y = 510;
+		frogger.direction = UP;
+		lockControls = false;
+		if (lives < 0) {
+			gameOver = true;
+			lockControls = true;
+			$('canvas').one('click', function() {
+				console.log('clicked');
+				$('body').off('keydown');
+				if (score > highscore) highscore = score;
+				clearInterval(intervalID);
+				start_game();
+			} );
+		}
+	}, 1000);
 }
+
 function win() {
 	frogger.sprite = frogger.sprites.sitting;
 	frogger.x = 197; frogger.y = 510;
@@ -387,11 +415,31 @@ function win() {
 	score += 50;
 	level++;
 	if (((level-1) % 5) == 0) score += 1000;
-	$('#on_your_marks_snd').play();
+	$('#on_your_marks_snd')[0].play();
+}
+function drawGameOver() {
+	ctx.save();
+
+	ctx.fillStyle = "rgba(0, 0, 0, 0.6)";		//TODO: rgba? how?
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	ctx.fillStyle = 'white';
+	ctx.fillRect(0, canvas.height/2 - 60, canvas.width, 110);
+	
+	ctx.fillStyle = 'black';
+	ctx.font = '48pt Helvetica';
+	ctx.textAlign = 'center';
+	ctx.fillText('Game Over!', canvas.width/2, canvas.height/2);
+	ctx.font = '18pt Helvetica';
+	ctx.fillText('Click anywhere to play again', canvas.width/2, canvas.height/2+35);
+	
+	ctx.restore();
 }
 
+/////////////// USER INPUT HANDLING ///
 function keyDown(event) {
 	console.log(event.keyCode);	//!!!:
+	if (lockControls) return;
 	switch(event.keyCode) {
 		case 38: 	//up
 			frogger.y -= 35;
@@ -429,17 +477,6 @@ function keyDown(event) {
 			console.log(collisions);
 			break;
 	}
-}
-
-//Alternate playing the 2 copies of the jump sound to allowing overlapping sound effects
-function playJumpSound() {
-	var jump_sound1 = $('#jump_snd1')[0];
-	var jump_sound2 = $('#jump_snd2')[0];
-	if (jump_sound1.currentTime > 0 && jump_sound1.currentTime < jump_sound1.duration) {
-		jump_sound2.play()
-	}
-	else
-		jump_sound1.play();
 }
 
 /////////////// DRAW FUNCTIONS ///
@@ -494,3 +531,14 @@ function drawOverlays() {
 function rand(start, end) { return Math.floor(Math.random()*(end-start+1)) + start; }
 
 function inGame(boundingBox) { return boundingBox.checkCollision(gameBB); }
+
+//Alternate playing the 2 copies of the jump sound to allowing overlapping sound effects
+function playJumpSound() {
+	var jump_sound1 = $('#jump_snd1')[0];
+	var jump_sound2 = $('#jump_snd2')[0];
+	if (jump_sound1.currentTime > 0 && jump_sound1.currentTime < jump_sound1.duration) {
+		jump_sound2.play()
+	}
+	else
+		jump_sound1.play();
+}
