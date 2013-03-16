@@ -135,7 +135,6 @@ var ctx; //the Canvas context
 var spriteSheet; //Image object of the sprite sheet
 var highscore = 0;
 function start_game() {
-	console.log('starting');
 	canvas = document.getElementById('game');
 	if (canvas.getContext) {
 		ctx = canvas.getContext('2d');
@@ -164,8 +163,8 @@ function start_game() {
 			
 			$('body').keydown(keyDown);
 			var music = $('#music_snd')[0];
-			//if (typeof music.loop == 'boolean') music.loop = true;
-			//else music.addEventListener('ended', function() { this.play(); }, false);		//TODO: loop callback!!
+			if (typeof music.loop == 'boolean') music.loop = true;
+			else music.addEventListener('ended', function() { this.play(); }, false);
 			music.play();
 			$('#get_started_snd')[0].play();
 			
@@ -384,7 +383,6 @@ function draw() {
 }
 
 function die() {
-	console.log('died');
 	frogger.direction = UP;
 	frogger.sprite = frogger.sprites.dead;
 	lives--;
@@ -399,7 +397,6 @@ function die() {
 			gameOver = true;
 			lockControls = true;
 			$('canvas').one('click', function() {
-				console.log('clicked');
 				$('body').off('keydown');
 				if (score > highscore) highscore = score;
 				clearInterval(intervalID);
@@ -439,7 +436,7 @@ function win() {
 function drawGameOver() {
 	ctx.save();
 
-	ctx.fillStyle = "rgba(0, 0, 0, 0.6)";		//TODO: rgba? how?
+	ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 	ctx.fillStyle = 'white';
@@ -457,7 +454,6 @@ function drawGameOver() {
 
 /////////////// USER INPUT HANDLING ///
 function keyDown(event) {
-	console.log(event.keyCode);	//!!!:
 	if (lockControls) return;
 	switch(event.keyCode) {
 		case 38: 	//up
@@ -493,7 +489,6 @@ function keyDown(event) {
 			break;
 		case 67:	//'c'	-- disable collisions
 			collisions = !collisions;
-			console.log(collisions);
 			break;
 	}
 }
