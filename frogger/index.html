@@ -9,13 +9,13 @@
 <script src="game.js"></script>
 </head>
 <body onload="start_game()">
-<audio id="jump_snd1" src="assets/jump.aif" preload="auto"></audio>
-<audio id="jump_snd2" src="assets/jump.aif" preload="auto"></audio>
-<audio id="music_snd" src="assets/music.aif" preload="auto"></audio>
-<audio id="death_snd" src="assets/death.aif" preload="auto"></audio>
-<audio id="game_over_snd" src="assets/game_over.aif" preload="auto"></audio>
-<audio id="get_started_snd" src="assets/get_started.aif" preload="auto"></audio>
-<audio id="on_your_marks_snd" src="assets/on_your_marks.aif" preload="auto"></audio>
+<audio id="jump_snd1" preload="auto"><source src="assets/jump.aif" /></audio>
+<audio id="jump_snd2" preload="auto"><source src="assets/jump.aif" /></audio>
+<audio id="music_snd" preload="auto"><source src="assets/music.aif" /></audio>
+<audio id="death_snd" preload="auto"><source src="assets/death.aif" /></audio>
+    <audio id="game_over_snd" preload="auto"><source src="assets/game_over.aif" /></audio>
+  <audio id="get_started_snd" preload="auto"><source src="assets/get_started.aif" /></audio>
+<audio id="on_your_marks_snd" preload="auto"><source src="assets/on_your_marks.aif" /></audio>
 <div id="game_div">
 <canvas id="game" height="565" width="399"></canvas>
 </div>

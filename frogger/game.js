@@ -8,7 +8,6 @@ var UP = -Math.PI/2;
 var DOWN = Math.PI/2;
 var LEFT = Math.PI;
 var RIGHT = 0;
-if (localStorage.froggerHighScore == null) localStorage.froggerHighScore = 0;
 
 /////////////// ABSTRACT TYPES AND CLASSES ///
 function BoundingBox(ul_x, ul_y, lr_x, lr_y) {
@@ -540,7 +539,7 @@ function drawOverlays() {
 	ctx.font = "bold 24px Helvetica";
 	ctx.fillText('Level ' + level, 58, canvas.height - 15);
 	ctx.font = "bold 12px Helvetica";
-	ctx.fillText('Score: ' + localStorage.froggerHighScore, 0, canvas.height - 2);
+	ctx.fillText('Score: ' + highscore, 0, canvas.height - 2);
 	ctx.fillText('Highscore: ' + highscore, 78, canvas.height - 2);
 	for (var i = 0; i < lives; i++)		//draw lives as frogs
 		ctx.drawImage(spriteSheet, 13, 334, 17, 23, i * 19, canvas.height - 35, 17, 23);

@@ -9,7 +9,7 @@ An homage to Frogger in HTML5's canvas.
 	4. Frogger loses a life when he hits a vehicle, the water, or the peninsulas of the "home" lilypad
 	5. Basic scoring is implemented.
   Additionally, I implemented:
-  - Game sounds
+  - Game sounds (only in Safari!)
   - Animation of Frogger to dead frog icon
   - (Exponetially) increasing difficulty with each level
   - Option to repeat the game after losing
