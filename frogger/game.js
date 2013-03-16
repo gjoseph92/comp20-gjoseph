@@ -159,6 +159,10 @@ function start_game() {
 			objects.push(frogger);
 			
 			$('body').keydown(keyDown);
+			var music = $('#music_snd');
+			if (typeof music.loop == 'boolean') music.loop = true;
+			else music.addEventListener('ended', function() { this.play(); }, false);
+			$('#get_started_snd').play();
 			
 			var intervalID = setInterval(gameLoop, 35);
 		}
@@ -374,6 +378,7 @@ function die() {
 	frogger.x = 197; frogger.y = 510;
 	frogger.direction = UP;
 	lives--;
+	$('#death_snd').play();
 }
 function win() {
 	frogger.sprite = frogger.sprites.sitting;
@@ -382,6 +387,7 @@ function win() {
 	score += 50;
 	level++;
 	if (((level-1) % 5) == 0) score += 1000;
+	$('#on_your_marks_snd').play();
 }
 
 function keyDown(event) {
