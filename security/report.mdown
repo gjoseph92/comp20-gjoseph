@@ -23,7 +23,6 @@
 	    		}
 	    	}
 	    });
-		console.log('boxed');
 	});
 </script>
 
@@ -49,7 +48,7 @@ Issues Found
 1. **Cross-Cross-Site Scripting**
 	- Affects GET API
 	- <span class="mod">Moderate</span>: though a nuisance for clients, this issue is at least easily-resolvable, and offending submissions can also be fixed retroactively.
-	- Data submitted via the POST API is not escaped, so it could include JavaScript or HTML (in place of a username or score) that a client's application would execute if it didn't include its own escaping. Though XSS is avoided on the web interface by escaping brackets (no `<script>`) and ampersands (`&#x3C;` won't produce `<`), an attacker can use ScoreCenter to attack a client's code. For example, running `curl --data "game_title=frogger&username=<iframe src='http://omfgdogs.com'></iframe>&score=9999999999" localhost:3000/submit.json` will not inject the amusing iframe into the ScoreCenter web interface, but might affect an unsuspecting client:
+	- Data submitted via the POST API is not escaped, so it could include JavaScript or HTML (in place of a username or score) that a client's application would execute if it didn't include its own escaping. Though XSS is avoided on the web interface by escaping brackets (no `<script>`) and ampersands (`&#x3C;` won't produce `<`), an attacker can use ScoreCenter to attack a client's code. For example, running `curl --data "game_title=frogger&username=<iframe src='http://omfgdogs.com'></iframe>&score=1000000" localhost:3000/submit.json` will not inject the amusing iframe into the ScoreCenter web interface, but might affect an unsuspecting client:
 	<table class="galleryTable">
 		<tr><td>![pre-injection](img/pre-xss-client.png "Client site before injection")</td>
 		<td>![post-injection](img/post-xss-client.png "Client site after injection")</td></tr>
@@ -65,5 +64,30 @@ Issues Found
 		<td>![GET crashes server](img/malformed-get.png "GETting the highscores crashes the server")</td>
 		<td>![Server log](img/malformed-log.png "The unexpected character causes an exception")</td></tr>
 	</table>
+	- This issue _could_ be resolved by just wrapping `JSON.parse(strJson)` in a try/catch block. However, it _should_ be resolved by removing the lengthy string-concatenation part, and just sending the array of results returned by Mongo directly through Express, which JSONifies it automatically. (No need for the `strJson` part, just call `response.send(docs)` after sorting.)
+	- **Sidenote**: though not a security flaw, I did notice that the scores aren't sorted correctly: `/highscores.json` gives the _latest 10 scores_ in sorted order, not the top 10 ever. This should be resolved by using a Mongo parameter to sort:
+
+			collection.find( { game_title : sanitize(req.query.game_title) }, {
+					sort : { score : -1 },
+					limit : 10,
+				} ).toArray(function(err, docs) {
+					response.send(docs);
+				});
 
 3. **Injection of additional database fields**
+	- In POST API; affects database only
+	- <span class="low">Low</span>: Arbitrary fields can be included in the database, but they are not currently returned by the GET API, so the only cost is in extra database space and lookups.
+	- By reviewing the code for the `/submit.json` route, I found that so long as the submission has the required fields, the entire submission body is added to the database by `collection.insert(request.body, ...`, including any extraneous fields. Because the `/highscores.json` code picks fields by name, these extra fields won't come back to a client, but they still take up space in the database.
+		<table class="galleryTable">
+		<tr><td>![Inserting extra fields](img/extra-field-curl.png "Submitting extra fields via POST")</td>
+		<td>![Server log](img/extra-field-mongo.png "All fields are stored in Mongo, including extras")</td></tr>
+	</table>
+
+4. **Arbitrary queries and JavaScript execution on Mongo**
+	- In user search; affects database execution
+	- <span class="low">High</span>: Given that the _least_ bad thing an attacker could do is perform any query possible on the database, this is serious. However, it is also easy to resolve.
+	- Reviewing the code for user search, I noticed that the user to look up is a GET parameter, but the Mongo search executes whatever that query is: `var cursor = collection.find(request.query);`, making anyone able to run any query against the database (and see the results in a pretty table view!) just by passing their query as a parameter. If the database contained private information, this would be a massive security flaw; as it is, all data is publicly available on the homepage. However, using MongoDB's `$where`, `mapReduce`, and `group` queries, attackers can execute (limited) JavaScript on the database. Modifying the data isn't possible, but a crude DoS attack can lock up the database with executing a meaningless query:
+			
+			{ $where: function() {
+				while(true) {}
+			}}
