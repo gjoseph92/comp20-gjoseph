@@ -1,0 +1,23 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+/*$.post('http://localhost:5000/submit.json', {
+	game_title : 'g',
+	username : 'un',
+	score : 15,
+}, function (data, textStatus) {
+	console.log('success:');
+	console.log(data);
+});*/
+</script>
+</head>
+<body>
+	<form name="highscore_add" action="http://localhost:3000/submit.json" method="post">
+		Game Title: <input type="text" name="game_title"><br/>
+		Username: <input type="text" name="username"><br/>
+		Score: <input type="text" name="score"><br/>
+		<input type="submit" value="Submit">
+	</form>
+</body>
+</html>

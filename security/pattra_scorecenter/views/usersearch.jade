@@ -1,0 +1,6 @@
+extend layout
+block content
+    form(enctype='application/x-www-form-urlencoded', action='/user_results', method='get')
+        input(type='text', id='input', name='username', placeholder='Search for a user...', value='')
+        span.spacer &nbsp;&nbsp;
+        input(type='submit', id='submit')

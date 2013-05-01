@@ -1,5 +1,33 @@
 <p><link rel="stylesheet" type="text/css" href="style.css"></link></p>
 
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<link rel="stylesheet" href="fancybox/source/jquery.fancybox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="fancybox/source/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.galleryTable').each(function(index, elem){
+            $('img', elem).wrap(function() {
+                return '<a class="fancybox" rel="gal' + index + '" href="' + $(this).prop('src') + '" title="' + $(this).prop('title') + '">' + $(this).html() + '</a>';
+            });
+        });
+
+        $('.fancybox').not("[rel^='gal']").wrap(function() {
+            return '<a class="fancybox" href="' + $(this).prop('src') + '" title="' + $(this).prop('title') + '">' + $(this).html() + '</a>';
+        });
+        $(".fancybox").fancybox({
+            openEffect  : 'elastic',
+            closeEffect : 'elastic',
+
+            helpers : {
+                title : {
+                    type : 'inside'
+                }
+            }
+        });
+        console.log('boxed');
+    });
+</script>
+
 <h1>Security Assessment of Scorecenter</h1>
 
 <p>Prepared by <a href="http://gjoseph92.github.io">Gabe Joseph</a> &bull; 4/30/2013</p>
@@ -12,17 +40,36 @@
 
 <h2>Methodology</h2>
 
-<p>Testing was first carried out "black-box", using just what would be available to an attacker. However, I ran all code locally, and therefore did have to modify it slightly to connect to a local mongo instance and not Heroku's. I started with just simple tools (<code>curl</code> and an HTML form I'd previously written to test my own code) and found multiple vulnerabilities using just those. I then tested the site with <strong><em>_</em></strong>, and finally reviewed the code to look for possible logic errors or opportunities for server-side exploitation.</p>
+<p>Testing was first carried out "black-box", using just what would be available to an attacker. However, I ran all code locally, and therefore did have to modify it slightly to connect to a local mongo instance and not Heroku's. Using just simple tools (<code>curl</code> and an HTML form I'd previously written to test my own code), I found multiple vulnerabilities. I then reviewed the code to look for possible logic errors or opportunities for server-side exploitation.</p>
 
 <h2>Abstract of Findings</h2>
 
 <h2>Issues Found</h2>
 
 <ol>
-<li><strong>Cross-Site Scripting</strong>
+<li><p><strong>Cross-Cross-Site Scripting</strong></p>
+
 <ul>
-<li>Submissions can include arbitrary code that executes in any user's browser</li>
-<li>Affects score list, user search, and GET API</li>
-<li><span class="mod">Moderate</span>: though a nuisance for clients that can render the whole site inoperable, this issue is at least easily-resolvable, and offending submissions can also be fixed retroactively.</li>
+<li>Affects GET API</li>
+<li><span class="mod">Moderate</span>: though a nuisance for clients, this issue is at least easily-resolvable, and offending submissions can also be fixed retroactively.</li>
+<li>Data submitted via the POST API is not escaped, so it could include JavaScript or HTML (in place of a username or score) that a client's application would execute if it didn't include its own escaping. Though XSS is avoided on the web interface by escaping brackets (no <code>&lt;script&gt;</code>) and ampersands (<code>&amp;#x3C;</code> won't produce <code>&lt;</code>), an attacker can use ScoreCenter to attack a client's code. For example, running <code>curl --data "game_title=frogger&amp;username=&lt;iframe src='http://omfgdogs.com'&gt;&lt;/iframe&gt;&amp;score=9999999999" localhost:3000/submit.json</code> will not inject the amusing iframe into the ScoreCenter web interface, but might affect an unsuspecting client:
+<table class="galleryTable">
+<tr><td><img src="img/pre-xss-client.png" alt="pre-injection" title="Client site before injection" /></td>
+<td><img src="img/post-xss-client.png" alt="post-injection" title="Client site after injection" /></td></tr>
+</table></li>
+<li>This issue can be resolved by escaping user input before it enters the database. For example, commonly-dangerous characters can be escaped to their HTML-code equivalents, then the input can be filtered through a whitelist of allowable characters (such as <code>str.match(/[\d\w\s\]|[\~\!\@\#\$\^\*\-\_\+\;]*/g).join('');</code>.</li>
 </ul></li>
+<li><p><strong>Server crash on invalid JSON</strong></p>
+
+<ul>
+<li>Affects GET API</li>
+<li><span class="mod">Moderate</span>: a simple attack can crash the Node web server, but the vulnerability is very easily resolvable</li>
+<li>As noted before, the data submitted is not escaped. Therefore, an attacker can submit data that results in malformed JSON (such as extra <code>,</code> or <code>"</code> characters), which makes the JSON parser throw an uncaught exception. Though escaping input of such characters might eliminate the symptom, the real problem is the convoluted code for the <code>/highscores.json</code> route. Rather than letting Express handle the JSONifying of the JavaScript object that results from a MongoDB query, the function tries to make JSON manually by string concatenation. However, in the final line, that string is parsed <em>back</em> into an object by <code>JSON.parse()</code>, which is given to Express to send as the response. (Which, of course, is converted to a string again by Express via <code>JSON.stringify()</code>.) Therefore, if the strings concatenated contain JSON characters (<code>{</code>, <code>"</code>, etc.), the parser will throw an exception, which ends the server:
+<table class="galleryTable">
+<tr><td><img src="img/malformed-submit.png" alt="Malformed data" title="Malformed data submitted via POST" /></td>
+<td><img src="img/malformed-get.png" alt="GET crashes server" title="GETting the highscores crashes the server" /></td>
+<td><img src="img/malformed-log.png" alt="Server log" title="The unexpected character causes an exception" /></td></tr>
+</table></li>
+</ul></li>
+<li><p><strong>Injection of additional database fields</strong></p></li>
 </ol>

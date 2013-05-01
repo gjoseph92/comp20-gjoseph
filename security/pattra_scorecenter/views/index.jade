@@ -1,0 +1,14 @@
+extend layout
+block content
+    table#app_content
+        tr#table_head
+            td GAME TITLE
+            td USERNAME
+            td SCORE
+            td CREATED AT
+        each item in content
+            tr
+                td #{item.game_title}
+                td #{item.username}
+                td #{item.score}
+                td #{item.created_at}

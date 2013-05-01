@@ -1,0 +1,21 @@
+!!!5
+html
+	head
+		title SCORE CENTER
+		link(rel='stylesheet', type='text/css', href='http://pattra.github.io/resources/scorecenter/stylesheets/scorecenter.css')
+	body
+		div#title
+			img(src='http://pattra.github.io/resources/scorecenter/images/sc_title01.png', title='SCORE CENTER')
+		div#nav
+			table#nav_table
+				tr
+					td
+						a(href='/') all scores
+					td
+						a(href='/usersearch') user search
+					td
+						a(href='/highscores.json') hiscores json
+					td
+						a(href='http://pattra.github.io') pattra@github
+		div#content
+				block content

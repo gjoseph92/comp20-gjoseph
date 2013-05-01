@@ -1,0 +1,12 @@
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+<body>
+	<script>
+		$.get("http://localhost:3000/highscores.json?game_title=frogger", function(data) {
+			$('body').append('<p>The score for ' + data[0].username + ' is ' + data[0].score + '</p>');
+		})
+	</script>
+</body>
+</html>
