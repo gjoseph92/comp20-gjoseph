@@ -1,0 +1,25 @@
+<link rel="stylesheet" type="text/css" href="style.css"></link>
+
+Security Assessment of Scorecenter
+==================================
+Prepared by [Gabe Joseph](http://gjoseph92.github.io) &bull; 4/30/2013
+
+Introduction
+------------
+This assessment tests the security of the [ScoreCenter](http://blooming-cliffs-4876.herokuapp.com/) web application developed by [@pattra](http://pattra.github.io/) for [Comp20 assignment 5](http://tuftsdev.github.io/WebProgramming/assignments/a5.html). According to the specifications she followed from _her_ client, ScoreCenter is "a web application that maintains high scores for HTML5 games" by providing an API for other developers to submit and retrieve the scores their games produce. It also offers a web interface where users can see all scores submitted, and search for scores by username. However, vulnerabilities in the application currently make it unsuitable for public use, so this document finds those vulnerabilities and suggests solutions for them.
+
+**What counts as a vulnerability?** That's a tough question, because my client's client's (or `client**`; many levels of client-indirection here) specifications demanded inherent insecurities. Most importantly, authentication is neither required nor allowed in the submission API specification, so anyone can submit a high score for any game under any username, with any score amount (which makes the highness of a "high score" dubious). At the least, implementing an API key, so each game accepts submissions from only certain developers, would be necessary to ensure the data is valid. Therefore, this assessment focuses mainly on vulnerabilities in the code, not how the API can be (ab)used with false submissions, which is arguably the biggest insecurity of all.
+
+Methodology
+-----------
+Testing was first carried out "black-box", using just what would be available to an attacker. However, I ran all code locally, and therefore did have to modify it slightly to connect to a local mongo instance and not Heroku's. I started with just simple tools (`curl` and an HTML form I'd previously written to test my own code) and found multiple vulnerabilities using just those. I then tested the site with _______, and finally reviewed the code to look for possible logic errors or opportunities for server-side exploitation.
+
+Abstract of Findings
+--------------------
+
+Issues Found
+------------
+1. **Cross-Site Scripting**
+	- Submissions can include arbitrary code that executes in any user's browser
+	- Affects score list, user search, and GET API
+	- <span class="mod">Moderate</span>: though a nuisance for clients that can render the whole site inoperable, this issue is at least easily-resolvable, and offending submissions can also be fixed retroactively.
